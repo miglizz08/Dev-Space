@@ -40,25 +40,26 @@ titulo, data, local e descricao.
 GUIA DE ESTUDO DO PROJETO ORGANIZA EVENTOS
 ======================================================================
 
-Guia iniciado em 05/10/2026 e atualizado em 07/10/2026, conforme o código atual.
+Guia iniciado em 05/10/2026 e atualizado em 10/10/2026, conforme o código atual.
 As anotações pessoais acima permanecem no início do arquivo.
 
 COMO USAR ESTE GUIA
 
-Leia as seções 1 a 9 e a atualização da seção 11. Depois, tente responder
-às perguntas das seções 10 e 11 sem consultar as respostas. Quando voltar ao computador,
-use os comandos da seção 7 para relacionar a teoria ao programa funcionando.
+Leia as seções 1 a 9 e as atualizações das seções 11 e 12. Depois, tente
+responder às perguntas de revisão sem consultar as respostas. Quando voltar
+ao computador, use os comandos da seção 7 para relacionar a teoria ao
+programa funcionando.
 
-Uma frase para guardar: a API já lista, cadastra e edita eventos em memória; o
-front-end ainda é uma estrutura inicial e não mostra os dados da API.
+Uma frase para guardar: a API lista, cadastra, edita e exclui eventos em
+memória; a página mostra a lista e o formulário já cadastra pela API.
 
 
 1. IDEIA DO PROJETO
 
 Nome: Organiza Eventos.
 Contexto: projeto acadêmico de Programação Front-End 01.
-Objetivo: permitir que um organizador cadastre festas e eventos e, futuramente,
-que as informações fiquem acessíveis ao público pela interface do site.
+Objetivo: permitir que um organizador gerencie festas e eventos e que as
+informações fiquem acessíveis ao público pela interface do site.
 Usuário principal: organizador de eventos.
 
 O registro de um evento tem estes campos:
@@ -74,31 +75,31 @@ Hoje a API exige titulo, data, horario e local para criar um registro. O campo
 descricao é aceito, mas não é exigido nem validado. O id é criado pelo servidor;
 quem faz o cadastro não precisa enviá-lo.
 
-O escopo inicial é o cadastro de eventos. Inscrições, ingressos, pagamentos e
-contas de usuário não fazem parte do que está implementado.
+O escopo atual é o gerenciamento de eventos. Inscrições, ingressos, pagamentos
+e contas de usuário não fazem parte do que está implementado.
 
 
 2. VISÃO GERAL: COMO AS PARTES SE RELACIONAM
 
 O projeto tem dois programas separados:
 
-  Navegador -> front-end Next.js (porta 3000)
-  Cliente HTTP -> back-end Express (porta 3001) -> array de eventos na memória
+  Navegador -> Next.js (porta 3000) -> busca GET -> API Express (porta 3001)
+  Cliente HTTP -> API Express (porta 3001) -> array de eventos na memória
 
 O front-end é a parte visual com as páginas que a pessoa abre no navegador. O
 back-end recebe requisições HTTP, trabalha com os dados e devolve JSON. JSON é
 um formato de texto usado para transportar objetos e listas entre programas.
 
-No futuro, a página de eventos deverá pedir os dados à API e renderizá-los.
-Esse fluxo ainda não existe: visitar /eventos no site mostra somente uma
-mensagem provisória. Hoje é possível consultar, cadastrar e editar eventos diretamente
-na API com um cliente HTTP, como o PowerShell.
+A página /eventos já pede os dados à API no servidor Next.js e mostra a lista
+no navegador. Um cliente HTTP, como o PowerShell, também pode consultar,
+cadastrar, editar e excluir eventos diretamente na API. O formulário visual
+agora envia cadastros pelo navegador; veja a seção 12.
 
-Os dois servidores usam portas diferentes. Portanto, as URLs
-http://localhost:3000 e http://localhost:3001 têm origens diferentes. O pacote
-cors está instalado no back-end, mas não foi ativado. Quando o front-end passar
-a fazer requisições à API pelo navegador, será necessário configurar essa
-permissão ou escolher outra forma adequada de integração.
+Os dois servidores usam portas diferentes. Por isso, http://localhost:3000 e
+http://localhost:3001 têm origens diferentes. O back-end agora usa cors() com
+a origem http://localhost:3000. A busca atual da lista ocorre no servidor
+Next.js; o CORS já é usado pelo POST do formulário feito diretamente no
+navegador.
 
 
 3. MAPA DOS ARQUIVOS IMPORTANTES
@@ -111,7 +112,8 @@ permissão ou escolher outra forma adequada de integração.
   frontend/package.json             Dependências e comandos do front-end.
   frontend/package-lock.json        Versões resolvidas das dependências.
   frontend/src/app/page.js          Página inicial do site: ainda é a padrão.
-  frontend/src/app/eventos/page.jsx Página /eventos: ainda é provisória.
+  frontend/src/app/eventos/page.jsx Busca e apresenta a lista de eventos.
+  frontend/src/app/components/EventoForm.jsx Formulário que envia POST à API.
   frontend/src/app/layout.js        Layout geral, fontes e metadados do site.
   frontend/src/app/globals.css      Estilos globais e reset de CSS.
   frontend/src/app/page.module.css  Estilos apenas da página inicial.
@@ -133,27 +135,28 @@ código pode escrever import express from 'express'.
 
 Ao iniciar backend/index.js, acontece esta sequência:
 
-  1) O código importa Express.
+  1) O código importa Express e cors.
   2) Cria o array eventos com dois exemplos: Halloween (id 1) e festa junina
      (id 2). Cada exemplo possui os seis campos descritos na seção 1.
   3) Cria a aplicação com express().
-  4) Ativa express.json(), que interpreta corpos JSON enviados à API e coloca
-     os dados em req.body.
-  5) Define proximoId como 3 e registra POST /eventos, GET /eventos
-     e PUT /eventos/:id.
+  4) Ativa cors({origin: 'http://localhost:3000'}) e express.json().
+     O segundo interpreta corpos JSON e coloca os dados em req.body.
+  5) Define proximoId como 3 e registra GET e POST /eventos, além de PUT
+     e DELETE /eventos/:id.
   6) Inicia o servidor na porta fixa 3001 com app.listen(3001, ...).
 
 "Array" é uma lista. Aqui, eventos é a lista de registros existentes. Ela fica
 na memória do processo do Node.js. Se o servidor for reiniciado, os cadastros
-feitos durante a execução desaparecem e a lista volta aos dois exemplos.
+feitos durante a execução desaparecem, assim como as edições e exclusões;
+a lista volta aos dois exemplos.
 Não há banco de dados ou arquivo usado para salvar novos eventos.
 
 ROTA GET /eventos
 
 GET significa pedir dados. Essa rota executa res.json(eventos) e responde com a
 lista inteira em JSON, na ordem em que os itens estão no array. Não recebe id,
-filtros ou parâmetros. A resposta normal tem status HTTP 200. Se nenhum POST
-foi feito desde a inicialização, a lista contém só os dois exemplos.
+filtros ou parâmetros. A resposta normal tem status HTTP 200. Logo após
+iniciar a API, antes de cadastros ou exclusões, há dois exemplos na lista.
 
 ROTA POST /eventos
 
@@ -194,10 +197,14 @@ Tecnologias: Next.js 16.3.8, React 19.2.8 e React DOM 19.2.8. React monta a
 interface com componentes. JSX permite escrever marcação semelhante a HTML
 dentro do código JavaScript. Next.js organiza rotas, desenvolvimento e build.
 
-Em /, frontend/src/app/page.js ainda exibe a tela criada pelo modelo inicial do
-Next.js, com logo e links da plataforma. Em /eventos, a página apresenta o
-título "EVENTOS" e a frase "Os eventos cadastrados aparecerão aqui.". Ela
-não faz fetch, não lê a API e não exibe os eventos do array.
+Em /, frontend/src/app/page.js ainda exibe a tela padrão do Next.js. Em
+/eventos, page.jsx é uma função async que faz fetch de GET /eventos com
+cache: 'no-store', transforma a resposta com data.json() e usa map() para
+mostrar titulo, data, horario, local e descricao. Se descricao estiver vazia,
+mostra "Sem descrição". A página também renderiza EventoForm, que envia novos
+eventos por POST. Não há tratamento explícito para falha da busca ou lista
+vazia; a API precisa estar ligada. Após cadastrar, a lista ainda não se
+atualiza automaticamente. Veja o fluxo e as limitações na seção 12.
 
 layout.js importa os estilos globais, carrega as fontes Geist e envolve todas
 as páginas. Seus metadados ainda dizem "Create Next App" e o idioma do HTML
@@ -241,9 +248,9 @@ status 201 e os mesmos dados acrescidos de "id": 3. Um corpo como
 {"titulo":"Teste"} falha com status 400 e mensagem "Data é obrigatória."
 porque a primeira validação, titulo, passa e a segunda, data, falha.
 
-A edição já está disponível em PUT /eventos/:id (veja a seção 11). Ainda não
-existem rotas para buscar um único evento pelo id ou excluí-lo. Também não há
-autenticação.
+A edição usa PUT /eventos/:id (seção 11) e a exclusão usa DELETE
+/eventos/:id (seção 12). Ainda não há rota para buscar um único evento por id
+nem autenticação.
 
 
 7. COMO EXECUTAR E EXPERIMENTAR NO COMPUTADOR
@@ -265,8 +272,10 @@ Terminal 2, site (a partir da raiz do projeto):
   npm ci
   npm run dev
 
-Abra http://localhost:3000/eventos para ver a página provisória. Abra
-http://localhost:3001/eventos para ver o JSON retornado pela API. O endereço
+Abra http://localhost:3000/eventos para ver a lista e o formulário. Inicie a
+API primeiro; a página depende dela. Abra http://localhost:3001/eventos para
+ver diretamente o JSON retornado pela API. Depois de cadastrar pelo
+formulário, recarregue /eventos para ver o novo item na lista. O endereço
 localhost aponta para o próprio computador onde os programas estão rodando.
 Em outro dispositivo, como um celular, localhost aponta para aquele outro
 dispositivo e não para o computador do projeto.
@@ -298,12 +307,12 @@ automatizados implementados.
 8. CONCEITOS QUE VALE ENTENDER
 
 API: interface pela qual um programa oferece operações a outro. Neste projeto,
-a API oferece listagem e cadastro em /eventos, além de edição em
-/eventos/:id.
+a API oferece listagem e cadastro em /eventos, além de edição e exclusão
+em /eventos/:id.
 
 Rota: combinação de método HTTP e caminho. GET /eventos e POST /eventos são
-rotas diferentes mesmo compartilhando o caminho. PUT /eventos/:id usa o id
-na URL para atualizar um evento específico.
+rotas diferentes mesmo compartilhando o caminho. PUT /eventos/:id atualiza
+e DELETE /eventos/:id remove o evento indicado pelo id da URL.
 
 Requisição e resposta: o cliente envia método, endereço e, no POST ou PUT, um corpo;
 o servidor processa e devolve status e dados.
@@ -312,8 +321,8 @@ req e res: no Express, req representa a requisição recebida; res permite monta
 a resposta. req.body contém os dados JSON interpretados por express.json().
 
 Status HTTP: número que informa o resultado. Aqui, 200 é consulta ou edição
-bem-sucedida, 201 é criação, 400 indica dados rejeitados e 404 indica que o
-evento solicitado para edição não foi encontrado.
+bem-sucedida ou exclusão concluída, 201 é criação, 400 indica dados rejeitados
+e 404 indica que o evento solicitado para editar ou excluir não foi encontrado.
 
 Estado em memória: dados guardados em uma variável durante a execução. É
 simples para aprender, mas não sobrevive ao reinício do processo.
@@ -321,10 +330,11 @@ simples para aprender, mas não sobrevive ao reinício do processo.
 Front-end e back-end: o primeiro desenha e recebe interações na interface; o
 segundo aplica as regras e mantém os dados do servidor.
 
-CORS: mecanismo do navegador que controla certas requisições entre origens
-distintas. Ele será relevante na integração da página com a API, pois as
-portas 3000 e 3001 formam origens diferentes. Comandos PowerShell não dependem
-da política de CORS do navegador.
+CORS: mecanismo do navegador para requisições entre origens distintas. A API
+agora permite a origem http://localhost:3000. O fetch atual da lista roda no
+servidor Next.js e não depende dessa permissão do navegador. O POST do
+formulário roda no navegador e usa o CORS configurado. PowerShell não depende
+de CORS.
 
 
 9. ESTADO ATUAL E PRÓXIMAS ETAPAS
@@ -334,22 +344,23 @@ Já funciona:
   - GET /eventos com os eventos presentes no array.
   - POST /eventos com id numérico sequencial e resposta 201.
   - PUT /eventos/:id para editar um evento, com resposta 200.
+  - DELETE /eventos/:id para remover um evento, com resposta 200 ou 404.
   - Validação básica de titulo, data, horario e local com resposta 400.
-  - Projeto Next.js iniciado e rota visual /eventos criada.
+  - CORS configurado para http://localhost:3000.
+  - Página /eventos lista dados da API e cadastra pelo formulário via POST.
 
 Ainda falta:
-  - Configurar CORS ou uma estratégia equivalente para o acesso do navegador.
-  - Implementar exclusão de eventos, se fizer parte da entrega pretendida.
+  - Mostrar sucesso ou erro no formulário e atualizar a lista após cadastrar.
+  - Adicionar ações visuais de editar e excluir usando PUT e DELETE.
+  - Tratar falhas ao buscar dados, sucesso e erro nas ações e lista vazia.
   - Decidir se haverá busca de um único evento por id.
-  - Criar a listagem real no front-end e o formulário de cadastro.
-  - Integrar a interface com a API; tratar carregamento, sucesso e erros.
   - Melhorar validações, aparência e experiência no celular.
   - Criar testes e preparar uma demonstração do fluxo completo.
   - Usar armazenamento persistente, caso os eventos precisem sobreviver a
     reinícios do servidor.
 
-O README.md ainda descreve apenas GET e POST. A rota PUT já existe no código e
-está explicada na seção 11 deste guia.
+O README.md já resume as quatro rotas e o estado atual da página. As seções
+11 e 12 deste guia explicam os detalhes mais recentes para estudo.
 
 
 10. REVISÃO ATIVA: TENTE RESPONDER SEM OLHAR
@@ -361,9 +372,9 @@ está explicada na seção 11 deste guia.
 5) O que acontece ao enviar {"titulo":"Teste"} no POST?
 6) O que acontece com eventos novos quando o back-end é reiniciado?
 7) O que aparece em http://localhost:3000/eventos neste momento?
-8) Por que CORS deverá ser considerado na integração pelo navegador?
-9) O que significa receber os status 200, 201 e 400 neste projeto?
-10) O que ainda seria necessário para mostrar os eventos na página visual?
+8) Qual origem o CORS da API permite?
+9) O que significam os status 200, 201, 400 e 404 neste projeto?
+10) O formulário já cadastra eventos na API? A lista muda sem recarregar?
 
 RESPOSTAS
 
@@ -373,13 +384,14 @@ RESPOSTAS
 4) titulo, data, horario e local; descricao não é validada.
 5) Retorna 400 com "Data é obrigatória." e não cria um evento.
 6) São perdidos; restam os dois registros iniciais.
-7) O título "EVENTOS" e uma mensagem provisória, sem listagem da API.
-8) Site e API usam portas diferentes e, portanto, origens diferentes.
-9) Consulta bem-sucedida, criação bem-sucedida e requisição rejeitada.
-10) Buscar dados da API, apresentar a lista e resolver o acesso entre origens.
+7) Título, formulário e lista de eventos buscada na API.
+8) http://localhost:3000.
+9) Sucesso em consulta/edição/exclusão, criação, dados rejeitados e id não
+encontrado, respectivamente.
+10) Sim, faz POST; a lista ainda precisa ser recarregada para mostrar o novo evento.
 
-Resumo de uma linha: hoje a API demonstra cadastro, listagem e edição em
-memória; a interface ainda precisa ser construída e conectada a ela.
+Resumo de uma linha: a API lista, cadastra, edita e exclui em memória; a
+página lista e cadastra, mas ainda não atualiza a lista após o envio.
 
 
 11. ATUALIZAÇÃO DE 07/10/2026: EDIÇÃO DE EVENTOS
@@ -408,7 +420,7 @@ Ordem do código:
 
 Como as validações ocorrem antes de eventos.find(), um corpo inválido enviado
 para um id inexistente recebe 400 antes de receber 404. O texto exato de
-algumas mensagens de erro do PUT contém erros de acentuação e digitação no
+algumas mensagens de erro do PUT ainda tem acentuação inconsistente no
 código atual; consulte backend/index.js se precisar reproduzi-las.
 
 A expressão descricao ?? '' grava uma string vazia quando descricao é omitida.
@@ -446,3 +458,97 @@ PERGUNTAS PARA REVISÃO DA EDIÇÃO
 
 RESPOSTAS: 1) PUT /eventos/1. 2) Não; reenvie titulo, data, horario e local.
 3) Vira string vazia. 4) Status 404. 5) Não, pois os dados ficam na memória.
+
+
+12. ATUALIZAÇÃO DE 10/10/2026: EXCLUSÃO, LISTA E FORMULÁRIO
+
+DELETE /eventos/:id
+
+O back-end agora tem uma rota de exclusão. Ela converte o id da URL com
+Number(req.params.id) e procura a posição do evento usando
+eventos.findIndex(evento => evento.id === id). Se não existir, findIndex
+devolve -1; a API responde status 404 e {"mensagem":"Evento não encontrado."}.
+Se existir, eventos.splice(indice, 1) retira esse item do array. A resposta
+normal é status 200 e {"mensagem":"Evento removido com sucesso."}.
+
+DELETE não pede corpo JSON e não altera proximoId. O próximo cadastro usa o
+próximo número sequencial, mesmo se algum id anterior foi excluído. A remoção
+fica apenas na memória: reiniciar a API restaura os dois eventos iniciais.
+
+Teste no PowerShell (com a API ligada):
+
+  Invoke-RestMethod -Uri 'http://localhost:3001/eventos/1' -Method Delete
+  Invoke-RestMethod -Uri 'http://localhost:3001/eventos' -Method Get
+
+O primeiro comando remove o evento 1; o segundo mostra a lista restante.
+Repetir o DELETE para o mesmo id responde 404. Para experimentar sem apagar
+um dos exemplos da sessão, cadastre um evento e exclua o id retornado.
+
+CORS CONFIGURADO
+
+backend/index.js importa cors e registra
+app.use(cors({origin: 'http://localhost:3000'})) antes das rotas. Isso define
+a origem permitida para chamadas à API feitas por uma página no navegador.
+As portas 3000 e 3001 continuam sendo origens diferentes. A busca atual da
+lista é feita pelo servidor Next.js, não diretamente pelo navegador; por isso
+esse fetch específico não depende de CORS. O formulário agora faz POST no
+navegador a partir de http://localhost:3000 e usa essa permissão.
+
+LISTA DE EVENTOS NO NEXT.JS
+
+frontend/src/app/eventos/page.jsx agora exporta uma função async. Ela executa
+fetch('http://localhost:3001/eventos', {cache: 'no-store'}), lê o JSON com
+data.json() e percorre eventos.map(...). Cada evento vira um item <li> com
+título, data, horário, local e descrição; evento.id é usado como key.
+A expressão evento.descricao || 'Sem descrição' substitui uma descrição
+vazia ou ausente por esse texto. A opção cache: 'no-store' pede dados novos
+em vez de usar uma resposta armazenada pelo Next.js.
+
+Essa página é um Server Component: não tem 'use client' e a busca roda no
+servidor Next.js. Portanto, a API deve estar acessível para esse servidor.
+O código ainda não verifica data.ok nem trata falhas do fetch ou do JSON.
+Se a API estiver desligada, a página pode mostrar erro. Se a lista estiver
+vazia, aparecerá uma lista sem itens, sem mensagem específica.
+
+FORMULÁRIO DE CADASTRO CONECTADO À API
+
+frontend/src/app/components/EventoForm.jsx começa com 'use client', pois seu
+evento onSubmit e o fetch de cadastro rodam no navegador. O componente tem
+campos de titulo (text), data (date), horario (time), local (text) e descricao
+(textarea), além do botão "Cadastrar evento". Os quatro primeiros usam
+required, validação básica do navegador que não substitui as regras da API.
+
+Ao enviar, enviarFormulario(event) chama event.preventDefault() para impedir
+o envio padrão do HTML. FormData(event.currentTarget) lê os campos do form;
+Object.fromEntries(formData) transforma os pares nome/valor em um objeto.
+O código envia esse objeto com fetch('http://localhost:3001/eventos'), método
+POST, cabeçalho Content-Type: application/json e JSON.stringify(dados) no
+corpo. Os campos chegam como strings; se a descrição estiver vazia, o textarea
+envia uma string vazia.
+
+Se resposta.ok for falso, o código lança Error('Erro ao cadastrar') e registra
+o erro com console.error. Se o POST funcionar, lê resposta.json() e registra
+no console o status (normalmente 201) e o evento criado. Uma falha de rede
+também cai no catch. A mensagem devolvida pela API em erros 400 não aparece
+na página; o código mostra apenas o erro genérico no console.
+
+Ainda não há mensagem visual de sucesso/erro, limpeza do form nem atualização
+automática da lista. Recarregar /eventos executa uma nova busca e mostra o
+cadastro feito enquanto a API continua ligada. Também não há botões de editar
+ou excluir na página. Para estudar o resultado do envio, abra o console do
+navegador e consulte GET /eventos.
+
+PERGUNTAS PARA REVISÃO DESTA ETAPA
+
+1) Qual método e rota removem o evento de id 2?
+2) Por que o DELETE pode retornar 404?
+3) Qual é a diferença entre findIndex() e splice() nessa rota?
+4) Onde roda o fetch da lista atual: no navegador ou no servidor Next.js?
+5) O que 'use client' muda no componente EventoForm?
+6) O que acontece ao clicar em "Cadastrar evento" com os campos válidos?
+
+RESPOSTAS: 1) DELETE /eventos/2. 2) O id não foi encontrado no array.
+3) findIndex localiza a posição; splice remove o item dessa posição.
+4) No servidor Next.js. 5) Marca o componente para interatividade no
+navegador. 6) O form envia POST /eventos, registra o resultado no console e
+não atualiza a lista automaticamente.

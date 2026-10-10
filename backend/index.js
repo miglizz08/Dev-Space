@@ -1,4 +1,5 @@
 import express from 'express';
+import cors from 'cors';
 
 const eventos = [{
     id:1,
@@ -21,6 +22,7 @@ const eventos = [{
 
 const app = express();
 
+app.use(cors({origin: 'http://localhost:3000'}));
 app.use(express.json());
 
 let proximoId = 3;
@@ -100,5 +102,19 @@ app.put('/eventos/:id', (req, res) => {
 
 
 });
+
+app.delete('/eventos/:id', (req, res)=> {
+    const id = Number(req.params.id);
+    const indice = eventos.findIndex(evento => evento.id === id);
+    if (indice === -1){
+        return res.status(404).json({mensagem: 'Evento não encontrado.'})
+    }
+
+    eventos.splice(indice, 1);
+
+    res.status(200).json({mensagem: 'Evento removido com sucesso.'})
+});
+
+
 
 app.listen(3001, () => console.log("API na porta 3001"));

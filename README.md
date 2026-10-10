@@ -1,20 +1,19 @@
 # Organiza Eventos
 
-Projeto acadêmico da disciplina **Programação Front-End 01** para organizar festas e eventos. O usuário principal é a pessoa responsável pelo cadastro. Cada evento tem título, data, horário, local e descrição.
+Projeto acadêmico da disciplina **Programação Front-End 01** para cadastrar e organizar festas e eventos.
 
 ## Estado atual
 
-- **Back-end:** API em Node.js e Express. Lista, cadastra e edita eventos por meio das rotas `GET /eventos`, `POST /eventos` e `PUT /eventos/:id`.
-- **Front-end:** projeto Next.js criado. A página `/eventos` ainda mostra apenas um texto provisório, e a página inicial mantém o conteúdo padrão do Next.js.
-- **Integração:** o front-end ainda não consulta a API. O pacote `cors` está instalado, mas não foi configurado no servidor.
-
-A API começa com dois eventos de exemplo em um array. Os novos eventos recebem IDs numéricos sequenciais. Os dados ficam somente na memória e voltam ao estado inicial quando o servidor reinicia.
+- **API:** feita com Node.js e Express. Lista, cadastra, edita e exclui eventos em um array na memória. Começa com dois eventos de exemplo; alterações são perdidas quando o servidor reinicia.
+- **Página de eventos:** a rota `/eventos` do Next.js busca os dados da API e mostra título, data, horário, local e descrição de cada evento.
+- **Formulário:** o botão envia os dados por `POST /eventos` e registra o resultado no console do navegador. Ainda não mostra mensagens na página nem atualiza a lista automaticamente.
+- **Acesso local:** a API aceita requisições do navegador em `http://localhost:3000` por meio de CORS. A página inicial (`/`) ainda é a padrão do Next.js.
 
 ## Como executar
 
-Tenha Node.js e npm instalados. Na raiz do projeto, abra dois terminais.
+Tenha Node.js e npm instalados. Abra dois terminais na raiz do projeto e inicie a API antes de abrir a página de eventos.
 
-**API — porta 3001**
+**Terminal 1 — API na porta 3001**
 
 ~~~powershell
 cd backend
@@ -22,7 +21,7 @@ npm ci
 node index.js
 ~~~
 
-**Front-end — porta 3000**
+**Terminal 2 — Next.js na porta 3000**
 
 ~~~powershell
 cd frontend
@@ -30,19 +29,20 @@ npm ci
 npm run dev
 ~~~
 
-Acesse `http://localhost:3000/eventos` para ver a página atual. A lista em JSON está disponível em `http://localhost:3001/eventos`.
+Abra `http://localhost:3000/eventos` para ver a lista e o formulário. A página precisa da API em execução para carregar os eventos. Após cadastrar, recarregue a página para ver o novo item; o resultado do envio aparece no console do navegador. Para consultar o JSON diretamente, use `http://localhost:3001/eventos`.
 
-## API disponível
+## Rotas da API
 
 | Método | Rota | Resultado |
 | --- | --- | --- |
-| `GET` | `/eventos` | Retorna todos os eventos em JSON. |
-| `POST` | `/eventos` | Cadastra um evento, atribui um ID e retorna status 201. |
-| `PUT` | `/eventos/:id` | Atualiza um evento existente e retorna o registro atualizado. |
+| `GET` | `/eventos` | Retorna a lista de eventos. |
+| `POST` | `/eventos` | Cadastra um evento com ID sequencial e retorna status 201. |
+| `PUT` | `/eventos/:id` | Atualiza um evento existente. |
+| `DELETE` | `/eventos/:id` | Remove um evento e retorna uma mensagem de sucesso. |
 
-No cadastro e na edição, `titulo`, `data`, `horario` e `local` devem ser textos não vazios. Se algum deles for inválido, a API responde com status 400 e uma mensagem. `descricao` é opcional; na edição, quando não é enviada, passa a ser uma string vazia. A edição responde com status 404 se o ID não corresponder a um evento.
+No `POST` e no `PUT`, `titulo`, `data`, `horario` e `local` devem ser textos não vazios. Dados obrigatórios inválidos geram status 400. A `descricao` é opcional; no `PUT`, se não for enviada, vira uma string vazia. `PUT` e `DELETE` retornam status 404 quando o evento não existe. A API ainda não verifica o formato real da data ou do horário.
 
-Exemplo de corpo JSON para `POST` ou `PUT`:
+Exemplo de corpo JSON para cadastrar ou editar:
 
 ~~~json
 {
@@ -54,15 +54,12 @@ Exemplo de corpo JSON para `POST` ou `PUT`:
 }
 ~~~
 
-A validação atual não confere se a data e o horário têm um formato válido.
-
 ## Próximos passos
 
-1. Implementar `DELETE /eventos/:id` e tratar IDs inexistentes.
-2. Configurar o CORS e melhorar a validação de data e horário.
-3. Substituir a página inicial padrão e listar os eventos da API no front-end.
-4. Criar o formulário de cadastro e integrar as ações de editar e excluir.
-5. Tratar carregamento, erros e mensagens de sucesso; revisar o layout no computador e no celular.
-6. Testar o fluxo completo e preparar a demonstração do projeto.
+1. Mostrar sucesso ou erro no formulário, limpar os campos após o cadastro e atualizar a lista sem recarregar a página.
+2. Adicionar ações de editar e excluir na interface usando `PUT` e `DELETE`.
+3. Tratar falhas de carregamento e o caso em que não há eventos.
+4. Substituir a página inicial padrão e revisar idioma, metadados e layout para computador e celular.
+5. Melhorar a validação de data e horário e testar o fluxo completo para a apresentação.
 
-O escopo inicial é o cadastro de eventos. Inscrições e venda de ingressos não estão previstas.
+Inscrições e venda de ingressos não fazem parte do escopo inicial.

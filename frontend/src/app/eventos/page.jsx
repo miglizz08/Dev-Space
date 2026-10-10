@@ -1,8 +1,23 @@
-export default function EventosPage() {
+import EventoForm from "../components/EventoForm";
+export default async function EventosPage() {
+    const data = await fetch('http://localhost:3001/eventos', {cache: 'no-store'})
+    const eventos = await data.json()
     return (
         <main>
             <h1>EVENTOS</h1>
-            <p>Os eventos cadastrados aparecerão aqui.</p>
+            <EventoForm />
+            <ul>
+                {eventos.map((evento) => (
+                    <li key={evento.id}>
+                    <p>{evento.titulo}</p>
+                    <p>{evento.data}</p>
+                    <p>{evento.horario}</p>
+                    <p>{evento.local}</p>
+                    <p>{evento.descricao || 'Sem descrição'}</p>
+                    </li>
+                        
+                ))}
+            </ul>
         </main>
     )
 }
