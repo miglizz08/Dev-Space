@@ -4,14 +4,17 @@ Projeto acadêmico da disciplina **Programação Front-End 01** para cadastrar e
 
 ## Estado atual
 
-- **API:** feita com Node.js e Express. Lista, cadastra, edita e exclui eventos em um array na memória. Começa com dois eventos de exemplo; alterações são perdidas quando o servidor reinicia.
-- **Página de eventos:** a rota `/eventos` do Next.js busca os dados da API e mostra título, data, horário, local e descrição de cada evento.
-- **Formulário:** o botão envia os dados por `POST /eventos` e registra o resultado no console do navegador. Ainda não mostra mensagens na página nem atualiza a lista automaticamente.
-- **Acesso local:** a API aceita requisições do navegador em `http://localhost:3000` por meio de CORS. A página inicial (`/`) ainda é a padrão do Next.js.
+- **API:** Node.js e Express com rotas para listar, cadastrar, editar e excluir eventos.
+- **Página de eventos:** `/eventos` busca os dados da API e apresenta título, data, horário, local e descrição.
+- **Cadastro:** o formulário envia o evento à API, apresenta uma mensagem de sucesso ou erro, impede envios repetidos, limpa os campos após o sucesso e atualiza a lista.
+- **Armazenamento:** os eventos ficam em um array na memória da API, que começa com dois exemplos. Os cadastros e alterações são perdidos quando o servidor reinicia.
+- **CORS:** configurado para permitir requisições do front-end em `http://localhost:3000`.
+
+A página inicial (`/`) ainda é a página padrão do Next.js. A interface ainda não oferece ações para editar ou excluir eventos.
 
 ## Como executar
 
-Tenha Node.js e npm instalados. Abra dois terminais na raiz do projeto e inicie a API antes de abrir a página de eventos.
+Tenha Node.js e npm instalados. Abra dois terminais na raiz do projeto e inicie a API antes do front-end.
 
 **Terminal 1 — API na porta 3001**
 
@@ -29,18 +32,18 @@ npm ci
 npm run dev
 ~~~
 
-Abra `http://localhost:3000/eventos` para ver a lista e o formulário. A página precisa da API em execução para carregar os eventos. Após cadastrar, recarregue a página para ver o novo item; o resultado do envio aparece no console do navegador. Para consultar o JSON diretamente, use `http://localhost:3001/eventos`.
+Acesse `http://localhost:3000/eventos`. A página precisa da API em execução para carregar a lista e cadastrar eventos. Para consultar os dados em JSON, use `http://localhost:3001/eventos`.
 
 ## Rotas da API
 
 | Método | Rota | Resultado |
 | --- | --- | --- |
-| `GET` | `/eventos` | Retorna a lista de eventos. |
+| `GET` | `/eventos` | Retorna todos os eventos. |
 | `POST` | `/eventos` | Cadastra um evento com ID sequencial e retorna status 201. |
 | `PUT` | `/eventos/:id` | Atualiza um evento existente. |
-| `DELETE` | `/eventos/:id` | Remove um evento e retorna uma mensagem de sucesso. |
+| `DELETE` | `/eventos/:id` | Remove um evento. |
 
-No `POST` e no `PUT`, `titulo`, `data`, `horario` e `local` devem ser textos não vazios. Dados obrigatórios inválidos geram status 400. A `descricao` é opcional; no `PUT`, se não for enviada, vira uma string vazia. `PUT` e `DELETE` retornam status 404 quando o evento não existe. A API ainda não verifica o formato real da data ou do horário.
+No cadastro e na edição, `titulo`, `data`, `horario` e `local` devem ser textos não vazios. Dados obrigatórios inválidos retornam status 400. `descricao` é opcional. A edição e a exclusão retornam status 404 se o ID não corresponder a um evento. A API ainda não valida o formato real da data e do horário.
 
 Exemplo de corpo JSON para cadastrar ou editar:
 
@@ -56,10 +59,9 @@ Exemplo de corpo JSON para cadastrar ou editar:
 
 ## Próximos passos
 
-1. Mostrar sucesso ou erro no formulário, limpar os campos após o cadastro e atualizar a lista sem recarregar a página.
-2. Adicionar ações de editar e excluir na interface usando `PUT` e `DELETE`.
-3. Tratar falhas de carregamento e o caso em que não há eventos.
-4. Substituir a página inicial padrão e revisar idioma, metadados e layout para computador e celular.
-5. Exibir retorno de sucesso e erro no cadastro, bloquear envios repetidos, atualizar a lista automaticamente, revisar data e horário e ensaiar a demonstração.
+1. Adicionar à interface opções para editar e excluir eventos.
+2. Tratar erros ao carregar a lista e mostrar um estado claro quando não houver eventos.
+3. Substituir a página inicial padrão e revisar idioma, metadados e layout para computador e celular.
+4. Melhorar a validação de data e horário na API e conferir o fluxo completo antes da demonstração.
 
 Inscrições e venda de ingressos não fazem parte do escopo inicial.

@@ -350,9 +350,8 @@ Já funciona:
   - Página /eventos lista dados da API e cadastra pelo formulário via POST.
 
 Ainda falta:
-  - Mostrar sucesso ou erro no formulário e atualizar a lista após cadastrar.
   - Adicionar ações visuais de editar e excluir usando PUT e DELETE.
-  - Tratar falhas ao buscar dados, sucesso e erro nas ações e lista vazia.
+  - Tratar falhas ao buscar dados e o caso em que não há eventos.
   - Decidir se haverá busca de um único evento por id.
   - Melhorar validações, aparência e experiência no celular.
   - Criar testes e preparar uma demonstração do fluxo completo.
@@ -388,10 +387,10 @@ RESPOSTAS
 8) http://localhost:3000.
 9) Sucesso em consulta/edição/exclusão, criação, dados rejeitados e id não
 encontrado, respectivamente.
-10) Sim, faz POST; a lista ainda precisa ser recarregada para mostrar o novo evento.
+10) Sim. Exibe o resultado, bloqueia o botão enquanto envia e atualiza a lista com router.refresh().
 
 Resumo de uma linha: a API lista, cadastra, edita e exclui em memória; a
-página lista e cadastra, mas ainda não atualiza a lista após o envio.
+página lista e cadastra, mostra o resultado e atualiza a lista após o envio.
 
 
 11. ATUALIZAÇÃO DE 07/10/2026: EDIÇÃO DE EVENTOS
@@ -526,17 +525,17 @@ POST, cabeçalho Content-Type: application/json e JSON.stringify(dados) no
 corpo. Os campos chegam como strings; se a descrição estiver vazia, o textarea
 envia uma string vazia.
 
-Se resposta.ok for falso, o código lança Error('Erro ao cadastrar') e registra
-o erro com console.error. Se o POST funcionar, lê resposta.json() e registra
-no console o status (normalmente 201) e o evento criado. Uma falha de rede
-também cai no catch. A mensagem devolvida pela API em erros 400 não aparece
-na página; o código mostra apenas o erro genérico no console.
+Depois do POST, o código lê a resposta como JSON. Se resposta.ok for falso,
+usa resultado.mensagem para criar o erro; falhas de rede também caem no catch.
+O estado enviando volta para false em finally. A seção 13 detalha as mensagens,
+o bloqueio do botão e a atualização da lista.
 
-Ainda não há mensagem visual de sucesso/erro, limpeza do form nem atualização
-automática da lista. Recarregar /eventos executa uma nova busca e mostra o
-cadastro feito enquanto a API continua ligada. Também não há botões de editar
-ou excluir na página. Para estudar o resultado do envio, abra o console do
-navegador e consulte GET /eventos.
+O componente mantém mensagem e estado de envio com useState. Durante o POST,
+o botão fica desativado e mostra "Cadastrando...". Se a API responder com
+erro, usa resultado.mensagem; falhas de rede também aparecem na mensagem. No
+sucesso, mostra "Evento cadastrado com sucesso.", limpa o formulário com
+formulario.reset() e chama router.refresh() para atualizar a lista do Server
+Component sem recarregar toda a página. Não há botões de editar ou excluir.
 
 PERGUNTAS PARA REVISÃO DESTA ETAPA
 
@@ -550,26 +549,33 @@ PERGUNTAS PARA REVISÃO DESTA ETAPA
 RESPOSTAS: 1) DELETE /eventos/2. 2) O id não foi encontrado no array.
 3) findIndex localiza a posição; splice remove o item dessa posição.
 4) No servidor Next.js. 5) Marca o componente para interatividade no
-navegador. 6) O form envia POST /eventos, registra o resultado no console e
-não atualiza a lista automaticamente.
+navegador. 6) Envia POST, mostra feedback, limpa no sucesso e atualiza com
+router.refresh().
 
 
-13. ATUALIZAÇÃO DE 13/10/2026: TESTE DO POST E PRÓXIMA TAREFA
+13. ATUALIZAÇÃO DE 13/10/2026: FEEDBACK E ATUALIZAÇÃO DA LISTA
 
-O formulário do front-end envia POST para http://localhost:3001/eventos. O
-componente EventoForm usa 'use client', associa enviarFormulario ao onSubmit,
-impede o envio HTML padrão com event.preventDefault(), lê os campos por
-FormData(event.currentTarget), converte os pares com Object.fromEntries e
-envia JSON com fetch. A API confirmou o cadastro e o evento apareceu no array.
+O teste inicial do POST confirmou que os dados chegam à API e entram no array.
+Durante os testes, envios repetidos antes do retorno criaram eventos duplicados.
+O formulário foi então atualizado para mostrar o andamento e o resultado do
+cadastro. Como os dados continuam na memória, reiniciar a API restaura os dois
+eventos de exemplo e apaga os cadastros e alterações da sessão.
 
-Durante os testes, o botão foi clicado várias vezes antes de aparecer um
-retorno visual, criando eventos repetidos. Como os dados ficam na memória,
-reiniciar a API encerra o processo e restaura os dois eventos iniciais.
+O componente EventoForm importa useState do React e useRouter de
+next/navigation. Ele guarda mensagem e enviando. Ao submeter, salva a referência
+do formulário, limpa a mensagem anterior e marca enviando como true. O botão
+fica disabled enquanto a requisição está ativa e troca o texto para
+"Cadastrando...", evitando novos cliques durante esse envio.
 
-O componente atualmente só registra resposta de sucesso no console. Se a API
-responder com erro, lança uma mensagem genérica e registra o erro no console.
-Ainda não exibe sucesso ou erro na página, não limpa o formulário e não
-atualiza a lista automaticamente. Próxima tarefa: usar useState para feedback
-e estado de envio, desabilitar o botão durante o POST, mostrar a mensagem,
-limpar os campos no sucesso e chamar router.refresh() para buscar a lista
-atualizada.
+Depois do POST, o código converte a resposta em JSON. Se resposta.ok for falso,
+usa resultado.mensagem para criar o erro. No sucesso, mostra
+"Evento cadastrado com sucesso.", chama formulario.reset() e executa
+router.refresh(). Essa ação pede ao Next.js uma nova renderização da página e
+uma nova busca GET, atualizando a lista sem recarregar a página inteira. No
+catch, setMensagem(erro.message) mostra a mensagem recebida; no finally,
+setEnviando(false) reabilita o botão.
+
+A interface agora mostra feedback de sucesso e erro e atualiza a lista. Ainda
+faltam ações visuais para editar ou excluir. O tratamento também depende de a
+resposta da API conter JSON válido; a página da lista continua sem tratamento
+explícito para falhas da busca inicial.
