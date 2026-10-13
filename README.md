@@ -60,6 +60,6 @@ Exemplo de corpo JSON para cadastrar ou editar:
 2. Adicionar ações de editar e excluir na interface usando `PUT` e `DELETE`.
 3. Tratar falhas de carregamento e o caso em que não há eventos.
 4. Substituir a página inicial padrão e revisar idioma, metadados e layout para computador e celular.
-5. Melhorar a validação de data e horário e testar o fluxo completo para a apresentação.
+5. Exibir retorno de sucesso e erro no cadastro, bloquear envios repetidos, atualizar a lista automaticamente, revisar data e horário e ensaiar a demonstração.
 
 Inscrições e venda de ingressos não fazem parte do escopo inicial.

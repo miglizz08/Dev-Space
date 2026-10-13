@@ -552,3 +552,24 @@ RESPOSTAS: 1) DELETE /eventos/2. 2) O id não foi encontrado no array.
 4) No servidor Next.js. 5) Marca o componente para interatividade no
 navegador. 6) O form envia POST /eventos, registra o resultado no console e
 não atualiza a lista automaticamente.
+
+
+13. ATUALIZAÇÃO DE 13/10/2026: TESTE DO POST E PRÓXIMA TAREFA
+
+O formulário do front-end envia POST para http://localhost:3001/eventos. O
+componente EventoForm usa 'use client', associa enviarFormulario ao onSubmit,
+impede o envio HTML padrão com event.preventDefault(), lê os campos por
+FormData(event.currentTarget), converte os pares com Object.fromEntries e
+envia JSON com fetch. A API confirmou o cadastro e o evento apareceu no array.
+
+Durante os testes, o botão foi clicado várias vezes antes de aparecer um
+retorno visual, criando eventos repetidos. Como os dados ficam na memória,
+reiniciar a API encerra o processo e restaura os dois eventos iniciais.
+
+O componente atualmente só registra resposta de sucesso no console. Se a API
+responder com erro, lança uma mensagem genérica e registra o erro no console.
+Ainda não exibe sucesso ou erro na página, não limpa o formulário e não
+atualiza a lista automaticamente. Próxima tarefa: usar useState para feedback
+e estado de envio, desabilitar o botão durante o POST, mostrar a mensagem,
+limpar os campos no sucesso e chamar router.refresh() para buscar a lista
+atualizada.
