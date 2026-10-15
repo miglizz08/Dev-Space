@@ -14,18 +14,18 @@ titulo, data, local e descricao.
 GUIA DE ESTUDO DO PROJETO ORGANIZA EVENTOS
 ======================================================================
 
-Guia iniciado em 05/10/2026 e atualizado em 10/10/2026, conforme o código atual.
+Guia iniciado em 05/10/2026 e atualizado em 15/10/2026, conforme o código atual.
 As anotações pessoais acima permanecem no início do arquivo.
 
 COMO USAR ESTE GUIA
 
-Leia as seções 1 a 9 e as atualizações das seções 11 e 12. Depois, tente
-responder às perguntas de revisão sem consultar as respostas. Quando voltar
+Leia as seções 1 a 9 e depois as atualizações 11 a 15. Tente responder às
+perguntas de revisão sem consultar as respostas. Quando voltar
 ao computador, use os comandos da seção 7 para relacionar a teoria ao
 programa funcionando.
 
-Uma frase para guardar: a API lista, cadastra, edita e exclui eventos em
-memória; a página mostra a lista e o formulário já cadastra pela API.
+Uma frase para guardar: a API e a interface permitem listar, cadastrar,
+editar e excluir eventos; a lista informa falhas de carregamento e quando está vazia.
 
 
 1. IDEIA DO PROJETO
@@ -88,6 +88,8 @@ navegador.
   frontend/src/app/page.js          Página inicial do site: ainda é a padrão.
   frontend/src/app/eventos/page.jsx Busca e apresenta a lista de eventos.
   frontend/src/app/components/EventoForm.jsx Formulário que envia POST à API.
+  frontend/src/app/components/EventosLista.jsx Lista eventos e inclui edição e exclusão.
+  frontend/src/app/components/EditarEventoForm.jsx Formulário que envia PUT à API.
   frontend/src/app/layout.js        Layout geral, fontes e metadados do site.
   frontend/src/app/globals.css      Estilos globais e reset de CSS.
   frontend/src/app/page.module.css  Estilos apenas da página inicial.
@@ -172,13 +174,13 @@ interface com componentes. JSX permite escrever marcação semelhante a HTML
 dentro do código JavaScript. Next.js organiza rotas, desenvolvimento e build.
 
 Em /, frontend/src/app/page.js ainda exibe a tela padrão do Next.js. Em
-/eventos, page.jsx é uma função async que faz fetch de GET /eventos com
-cache: 'no-store', transforma a resposta com data.json() e usa map() para
-mostrar titulo, data, horario, local e descricao. Se descricao estiver vazia,
-mostra "Sem descrição". A página também renderiza EventoForm, que envia novos
-eventos por POST. Não há tratamento explícito para falha da busca ou lista
-vazia; a API precisa estar ligada. Após cadastrar, a lista ainda não se
-atualiza automaticamente. Veja o fluxo e as limitações na seção 12.
+/eventos, page.jsx busca GET /eventos com cache no-store. Se a resposta HTTP
+não for bem-sucedida ou ocorrer falha de rede/leitura do JSON, mostra mensagem
+para verificar se a API está rodando. Se a resposta for lista vazia, orienta
+a cadastrar o primeiro evento. Com itens, passa-os para EventosLista, que
+mostra dados e ações de editar e excluir. EventoForm envia novos eventos por
+POST. Após cadastro, edição ou exclusão, router.refresh() atualiza a lista.
+Veja as seções 12 e 15.
 
 layout.js importa os estilos globais, carrega as fontes Geist e envolve todas
 as páginas. Seus metadados ainda dizem "Create Next App" e o idioma do HTML
@@ -248,8 +250,8 @@ Terminal 2, site (a partir da raiz do projeto):
 
 Abra http://localhost:3000/eventos para ver a lista e o formulário. Inicie a
 API primeiro; a página depende dela. Abra http://localhost:3001/eventos para
-ver diretamente o JSON retornado pela API. Depois de cadastrar pelo
-formulário, recarregue /eventos para ver o novo item na lista. O endereço
+ver diretamente o JSON retornado pela API. Depois de cadastrar, editar ou excluir pelo formulário, a interface chama
+router.refresh() para atualizar a lista. O endereço
 localhost aponta para o próprio computador onde os programas estão rodando.
 Em outro dispositivo, como um celular, localhost aponta para aquele outro
 dispositivo e não para o computador do projeto.
@@ -321,19 +323,18 @@ Já funciona:
   - DELETE /eventos/:id para remover um evento, com resposta 200 ou 404.
   - Validação básica de titulo, data, horario e local com resposta 400.
   - CORS configurado para http://localhost:3000.
-  - Página /eventos lista dados da API e cadastra pelo formulário via POST.
+  - Página /eventos lista dados, cadastra, edita e exclui pela interface.
+  - A página mostra erro de carregamento e mensagem específica para lista vazia.
 
 Ainda falta:
-  - Adicionar ações visuais de editar e excluir usando PUT e DELETE.
-  - Tratar falhas ao buscar dados e o caso em que não há eventos.
   - Decidir se haverá busca de um único evento por id.
   - Melhorar validações, aparência e experiência no celular.
   - Criar testes e preparar uma demonstração do fluxo completo.
   - Usar armazenamento persistente, caso os eventos precisem sobreviver a
     reinícios do servidor.
 
-O README.md já resume as quatro rotas e o estado atual da página. As seções
-11 e 12 deste guia explicam os detalhes mais recentes para estudo.
+O README.md resume as rotas e o estado atual da página. As seções 11, 12, 14
+e 15 deste guia explicam as operações e a interface para estudo.
 
 
 10. REVISÃO ATIVA: TENTE RESPONDER SEM OLHAR
@@ -418,8 +419,8 @@ troque /1 por /999 e envie o mesmo corpo válido: a resposta será 404.
 Limites atuais: não há verificação de formato real de data, horário ou id.
 Um id não numérico é convertido para NaN e não encontra evento. Um corpo
 totalmente ausente pode causar erro do servidor ao desestruturar req.body, em
-vez de uma resposta 400. Ainda não há botão ou formulário de edição no
-front-end; a rota é usada diretamente por um cliente HTTP.
+vez de uma resposta 400. A rota também é usada pela interface por meio de
+EditarEventoForm.jsx; veja a seção 15 para o fluxo do formulário.
 
 PERGUNTAS PARA REVISÃO DA EDIÇÃO
 
@@ -479,9 +480,9 @@ em vez de usar uma resposta armazenada pelo Next.js.
 
 Essa página é um Server Component: não tem 'use client' e a busca roda no
 servidor Next.js. Portanto, a API deve estar acessível para esse servidor.
-O código ainda não verifica data.ok nem trata falhas do fetch ou do JSON.
-Se a API estiver desligada, a página pode mostrar erro. Se a lista estiver
-vazia, aparecerá uma lista sem itens, sem mensagem específica.
+A página verifica resposta.ok e captura falhas de rede ou leitura do JSON.
+Nesses casos, mostra mensagem para verificar se a API está rodando. Se a lista
+estiver vazia, mostra orientação para cadastrar o primeiro evento.
 
 FORMULÁRIO DE CADASTRO CONECTADO À API
 
@@ -509,7 +510,9 @@ o botão fica desativado e mostra "Cadastrando...". Se a API responder com
 erro, usa resultado.mensagem; falhas de rede também aparecem na mensagem. No
 sucesso, mostra "Evento cadastrado com sucesso.", limpa o formulário com
 formulario.reset() e chama router.refresh() para atualizar a lista do Server
-Component sem recarregar toda a página. Não há botões de editar ou excluir.
+Component sem recarregar toda a página. Naquele registro, havia exclusão
+visual na lista; a edição visual foi acrescentada depois e está descrita na
+seção 15.
 
 PERGUNTAS PARA REVISÃO DESTA ETAPA
 
@@ -549,7 +552,92 @@ uma nova busca GET, atualizando a lista sem recarregar a página inteira. No
 catch, setMensagem(erro.message) mostra a mensagem recebida; no finally,
 setEnviando(false) reabilita o botão.
 
-A interface agora mostra feedback de sucesso e erro e atualiza a lista. Ainda
-faltam ações visuais para editar ou excluir. O tratamento também depende de a
-resposta da API conter JSON válido; a página da lista continua sem tratamento
-explícito para falhas da busca inicial.
+A interface de cadastro mostra feedback, impede envios repetidos, limpa o
+formulário no sucesso e atualiza a lista. Edição e exclusão também têm ações
+visuais e atualizam após sucesso. A busca inicial agora trata resposta HTTP
+malsucedida, falha de rede/JSON e lista vazia; consulte a seção 15.
+
+
+14. ATUALIZAÇÃO DE 15/10/2026: EXCLUSÃO NA INTERFACE
+
+A lista foi separada da página em frontend/src/app/components/EventosLista.jsx.
+A página /eventos busca os registros no servidor e passa o array como prop
+eventos para EventoLista. O componente usa map() para renderizar cada item e
+mantém uma mensagem de sucesso com useState. Para cada evento, inclui o
+componente ExcluirEventoButton e passa o id e uma função onSucesso.
+
+frontend/src/app/components/ExcluirEventoButton.jsx é um componente cliente.
+Ao clicar em "Excluir", ele envia fetch para
+http://localhost:3001/eventos/{id} com método DELETE e sem corpo. Durante a
+requisição, excluindo fica true, o botão é desativado e mostra "Excluindo...".
+A resposta é lida como JSON. Se não for bem-sucedida, a mensagem da API aparece
+perto do botão. Se der certo, o componente informa ao EventoLista qual evento
+foi excluído e chama router.refresh().
+
+O refresh faz a página servidor buscar GET /eventos novamente; o item removido
+some da lista sem recarregar o navegador inteiro. A API responde 200 com
+"Evento removido com sucesso." ou 404 com "Evento não encontrado.". O
+registro também é removido do array em memória, portanto a exclusão se perde
+quando a API reinicia, assim como os demais cadastros.
+
+Na época registrada nesta seção, a interface já permitia cadastrar e excluir
+eventos. A edição visual e os estados de erro/lista vazia foram acrescentados
+depois e estão documentados na seção 15.
+
+PERGUNTAS PARA REVISÃO DA EXCLUSÃO NA PÁGINA
+
+1) Qual componente renderiza cada evento e o botão de exclusão?
+2) O que o botão envia à API?
+3) Como o item removido some da página sem recarregar o navegador?
+4) O que acontece se o servidor responder 404?
+5) A interface já permite editar eventos?
+
+RESPOSTAS: 1) EventoLista em EventosLista.jsx. 2) DELETE para
+/eventos/{id}, sem corpo. 3) O sucesso chama router.refresh(), que refaz a
+busca GET. 4) Mostra a mensagem de erro da API perto do botão. 5) Na época deste registro ainda não; veja a seção 15 para o estado atual.
+
+
+15. ATUALIZAÇÃO DE 15/10/2026: EDIÇÃO VISUAL E ESTADOS DA LISTA
+
+EDIÇÃO PELA INTERFACE
+
+frontend/src/app/components/EditarEventoForm.jsx adiciona uma ação "Editar"
+a cada evento. Inicialmente aparece só o botão; ao clicar, abre um formulário
+preenchido com os dados atuais. Título, data, horário e local são obrigatórios
+no navegador; descrição é opcional. O id vem da propriedade evento e vai na
+URL, não é um campo editável.
+
+Ao salvar, o componente lê os campos com FormData e Object.fromEntries() e
+envia JSON por PUT para http://localhost:3001/eventos/{id}. Enquanto salva,
+o botão fica desativado e mostra "Salvando...". "Cancelar" fecha o formulário
+sem enviar. Se a API retornar erro, a mensagem aparece no próprio formulário.
+No sucesso, EventosLista mostra qual evento foi atualizado, o formulário fecha
+e router.refresh() refaz a busca para mostrar os dados novos.
+
+ERRO E LISTA VAZIA EM /eventos
+
+page.jsx inicializa eventos como lista vazia e erro como null. A busca GET usa
+cache no-store e verifica resposta.ok. Resposta HTTP malsucedida ou falha de
+rede/leitura JSON mostra: "Não foi possível carregar os eventos. Verifique se
+a API está rodando". Se a resposta for lista vazia, aparece: "Nenhum evento
+cadastrado. Use o formulário acima para criar o primeiro." Com itens, mostra
+EventosLista. A mensagem de erro é genérica; o detalhe técnico não aparece.
+O formulário de cadastro continua visível mesmo quando a busca falha.
+
+FLUXO ATUAL
+
+  GET /eventos -> erro, estado vazio ou EventosLista
+  EventoForm -> POST -> router.refresh() -> lista atualizada
+  EditarEventoForm -> PUT /eventos/:id -> router.refresh() -> item atualizado
+  ExcluirEventoButton -> DELETE /eventos/:id -> router.refresh() -> item removido
+
+PERGUNTAS DE REVISÃO
+
+1) Qual componente envia PUT ao clicar em Editar? 2) De onde vem o id?
+3) O que faz Cancelar? 4) Qual mensagem aparece quando GET falha?
+5) O que aparece se a lista vier vazia? 6) O que router.refresh() faz?
+
+RESPOSTAS: 1) EditarEventoForm.jsx. 2) Da propriedade evento usada na URL.
+3) Fecha sem enviar. 4) "Não foi possível carregar os eventos. Verifique se
+a API está rodando". 5) A orientação para cadastrar o primeiro evento.
+6) Solicita nova renderização e nova busca GET, atualizando a lista.

@@ -5,12 +5,12 @@ Projeto acadêmico da disciplina **Programação Front-End 01** para cadastrar e
 ## Estado atual
 
 - **API:** Node.js e Express com rotas para listar, cadastrar, editar e excluir eventos.
-- **Página de eventos:** `/eventos` busca os dados da API e apresenta título, data, horário, local e descrição.
+- **Página de eventos:** /eventos busca os dados da API, apresenta as informações de cada evento e oferece controles para editar e excluir. Também mostra mensagens quando a API falha ou não há eventos cadastrados.
 - **Cadastro:** o formulário envia o evento à API, apresenta uma mensagem de sucesso ou erro, impede envios repetidos, limpa os campos após o sucesso e atualiza a lista.
 - **Armazenamento:** os eventos ficam em um array na memória da API, que começa com dois exemplos. Os cadastros e alterações são perdidos quando o servidor reinicia.
 - **CORS:** configurado para permitir requisições do front-end em `http://localhost:3000`.
 
-A página inicial (`/`) ainda é a página padrão do Next.js. A interface ainda não oferece ações para editar ou excluir eventos.
+A página inicial (/) ainda é a página padrão do Next.js. A interface permite cadastrar, editar e excluir eventos. A página de eventos também informa quando não consegue carregar a lista ou quando ela está vazia.
 
 ## Como executar
 
@@ -59,9 +59,7 @@ Exemplo de corpo JSON para cadastrar ou editar:
 
 ## Próximos passos
 
-1. Adicionar à interface opções para editar e excluir eventos.
-2. Tratar erros ao carregar a lista e mostrar um estado claro quando não houver eventos.
-3. Substituir a página inicial padrão e revisar idioma, metadados e layout para computador e celular.
-4. Melhorar a validação de data e horário na API e conferir o fluxo completo antes da demonstração.
+1. Substituir a página inicial padrão e revisar idioma, metadados e layout para computador e celular.
+2. Melhorar a validação de data e horário na API e conferir o fluxo completo antes da demonstração.
 
 Inscrições e venda de ingressos não fazem parte do escopo inicial.

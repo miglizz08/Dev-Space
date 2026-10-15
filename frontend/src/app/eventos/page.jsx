@@ -1,26 +1,34 @@
 import EventoForm from "@/app/components/EventoForm";
-import ExcluirEventoButton from "@/app/components/ExcluirEventoButton";
+import EventoLista from "../components/EventosLista";
 
 export default async function EventosPage() {
-    const data = await fetch('http://localhost:3001/eventos', { cache: 'no-store' });
-    const eventos = await data.json();
+    let eventos = [];
+    let erro = null;
+
+    try{
+        const resposta = await fetch('http://localhost:3001/eventos', { cache: 'no-store' });
+        
+        if(!resposta.ok) {
+            throw new Error(`Erro HTTP: ${resposta.status}`);
+        }
+    
+        eventos = await resposta.json();
+    } catch(e) {
+        erro = 'Não foi possível carregar os eventos. Verifique se a API está rodando';
+    }
 
     return (
         <main>
             <h1>EVENTOS</h1>
             <EventoForm />
-            <ul>
-                {eventos.map((evento) => (
-                    <li key={evento.id}>
-                        <p>{evento.titulo}</p>
-                        <p>{evento.data}</p>
-                        <p>{evento.horario}</p>
-                        <p>{evento.local}</p>
-                        <p>{evento.descricao || 'Sem descrição'}</p>
-                        <ExcluirEventoButton id={evento.id} onSucesso={() => setMensagem(`Evento "${evento.titulo}" excluído`)} />
-                    </li>
-                ))}
-            </ul>
+
+            {erro ? (
+                <p>{erro}</p>
+            ) : eventos.length > 0 ? (
+                <EventoLista eventos={eventos} />
+            ) : (
+                <p>Nenhum evento cadastrado. Use o formulário acima para criar o primeiro.</p>
+            )}
         </main>
     );
 }
