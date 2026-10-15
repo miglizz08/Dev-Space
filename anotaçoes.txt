@@ -1,29 +1,3 @@
-const eventos = [{
-id: 1,
-titulo: "halloween",
-data: "2026-10-31",
-horario: "19:00",
-local: "liv_music",
-descricao: "festa halloween onde tem que vim fantasiado, aproveitar a festa e tera um dj tocando"
-},
-
-{
-id: 2,
-titulo: "festa junina",
-data: "2026-06-12",
-horario: "13:00",
-local: "Clube da cidade",
-descricao: "Festa de São João para comemorarmos e comermos comidas tipicas"
-}
-
-];
-
-
-Invoke-RestMethod -Uri "http://localhost:3001/eventos" -Method Post -ContentType "application/json" -Body '{"titulo":"Teste"}'
-
-
-
-
 Nome (do projeto/app):
 Organiza Eventos
 
