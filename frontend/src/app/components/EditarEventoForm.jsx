@@ -1,6 +1,7 @@
 'use client';
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { tipos } from "../../../lib/tipos";
 
 export default function EditarEventoForm({ evento, onSucesso }){
     const [editando, setEditando] = useState(false);
@@ -48,7 +49,7 @@ export default function EditarEventoForm({ evento, onSucesso }){
 
     if(!editando) {
         return (
-            <button type="button" onClick={() => setEditando(true)}>
+            <button className="action-link action-edit" type="button" onClick={() => setEditando(true)}>
                 Editar
             </button>
         );
@@ -91,6 +92,19 @@ return (
             required
         />
 
+        <label htmlFor={`tipo-${evento.id}`}>Tipo do evento: </label>
+        <select
+            id={`tipo-${evento.id}`}
+            name="tipo"
+            defaultValue={evento.tipo ?? ''}
+            required
+        >
+            <option value="" disabled>Selecione um tipo</option>
+            {tipos.map((tipo) => (
+                <option key={tipo.value} value={tipo.value}>{tipo.label}</option>
+            ))}
+        </select>
+
         <label htmlFor={`descricao-${evento.id}`}>Descrição: </label>
         <textarea
             id={`descricao-${evento.id}`}
@@ -98,14 +112,14 @@ return (
             defaultValue={evento.descricao}
         ></textarea>
 
-        <button type="submit" disabled={salvando}> 
+        <button className="button button-primary" type="submit" disabled={salvando}> 
             {salvando ? 'Salvando...' : 'Salvar'}
         </button>
-        <button type="button" onClick={() => setEditando(false)}>
+        <button className="button button-secondary" type="button" onClick={() => setEditando(false)}>
             Cancelar
         </button>
 
-        {mensagem && <p>{mensagem}</p>}
+        {mensagem && <p className="error-state" role="alert">{mensagem}</p>}
     </form>
 );
 }

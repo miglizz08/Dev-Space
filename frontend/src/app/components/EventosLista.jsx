@@ -1,30 +1,30 @@
-'use client';
-import { useState } from "react";
-import ExcluirEventoButton from "./ExcluirEventoButton";
-import EditarEventoForm from "./EditarEventoForm";
+"use client";
+
+import { useMemo, useState } from "react";
+import EventCard from "./EventCard";
+import FiltroTipos from "./FiltroTipos";
 
 export default function EventoLista({ eventos }) {
-    const [mensagem, setMensagem] = useState('');
+  const [tipoSelecionado, setTipoSelecionado] = useState("todos");
+  const [mensagem, setMensagem] = useState("");
+  const filtrados = useMemo(() => {
+    const resultado = tipoSelecionado === "todos"
+      ? eventos
+      : eventos.filter((evento) => evento.tipo === tipoSelecionado);
+    return [...resultado].sort((a, b) => a.data.localeCompare(b.data));
+  }, [eventos, tipoSelecionado]);
 
-    return (
-        <div>
-            {mensagem && <p>{mensagem}</p>}
-            <ul>
-                {eventos.map((evento) => (
-                    <li key={evento.id}>
-                        <p>{evento.titulo}</p>
-                        <p>{evento.data}</p>
-                        <p>{evento.horario}</p>
-                        <p>{evento.local}</p>
-                        <p>{evento.descricao || 'Sem descrição'}</p>
-                        <ExcluirEventoButton
-                            id={evento.id}
-                            onSucesso={() => setMensagem(`Evento "${evento.titulo}" excluído.`)}
-                        />
-                        <EditarEventoForm evento={evento} onSucesso={() => setMensagem(`Evento "${evento.titulo}" atualizado`)} />
-                    </li>
-                ))}
-            </ul>
-        </div>
-    );
+  return (
+    <section className="event-list-section" aria-label="Lista de eventos">
+      <FiltroTipos selecionado={tipoSelecionado} onSelecionar={setTipoSelecionado} quantidade={filtrados.length} />
+      {mensagem && <p className="status-state" role="status">{mensagem}</p>}
+      {filtrados.length ? (
+        <ul className="ag-lista">
+          {filtrados.map((evento) => <EventCard key={evento.id} evento={evento} onSucesso={setMensagem} />)}
+        </ul>
+      ) : (
+        <p className="empty-state">Nenhum evento neste tipo ainda.</p>
+      )}
+    </section>
+  );
 }

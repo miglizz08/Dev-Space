@@ -38,11 +38,11 @@ export default function ExcluirEventoButton({ id, onSucesso }) {
     }
 
     return (
-        <div>
-            <button type="button" onClick={excluir} disabled={excluindo}>
+        <div className="delete-action-wrap">
+            <button className="action-link action-delete" type="button" onClick={excluir} disabled={excluindo}>
                 {excluindo ? 'Excluindo...' : 'Excluir'}
             </button>
-            {mensagem && <p>{mensagem}</p>}
+            {mensagem && <p className="error-state" role="alert">{mensagem}</p>}
         </div>
     );
 }

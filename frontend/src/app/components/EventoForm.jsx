@@ -1,9 +1,11 @@
 'use client';
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { tipos } from "../../../lib/tipos";
 
 export default function EventoForm() {
     const [mensagem, setMensagem] = useState('');
+    const [erro, setErro] = useState(false);
     const [enviando, setEnviando] = useState(false);
     const router = useRouter();
 
@@ -12,6 +14,7 @@ export default function EventoForm() {
 
         const formulario = event.currentTarget;
         setMensagem('');
+        setErro(false);
         setEnviando(true);
 
         let sucesso = false;
@@ -37,6 +40,7 @@ export default function EventoForm() {
             sucesso = true;
         } catch (erro) {
             setMensagem(erro.message);
+            setErro(true);
         } finally {
             setEnviando(false);
         }
@@ -60,14 +64,22 @@ export default function EventoForm() {
             <label htmlFor="local">Local: </label>
             <input id="local" type="text" name="local" required />
 
+            <label htmlFor="tipo">Tipo do evento: </label>
+            <select id="tipo" name="tipo" required defaultValue="">
+                <option value="" disabled>Selecione um tipo</option>
+                {tipos.map((tipo) => (
+                    <option key={tipo.value} value={tipo.value}>{tipo.label}</option>
+                ))}
+            </select>
+
             <label htmlFor="descricao">Descrição: </label>
             <textarea id="descricao" name="descricao"></textarea>
 
-            <button type="submit" disabled={enviando}>
+            <button className="button button-primary" type="submit" disabled={enviando}>
                 {enviando ? 'Cadastrando...' : 'Cadastrar evento'}
             </button>
 
-            {mensagem && <p>{mensagem}</p>}
+            {mensagem && <p className={erro ? "error-state" : "status-state"} role={erro ? "alert" : "status"}>{mensagem}</p>}
         </form>
     );
 }

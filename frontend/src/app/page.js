@@ -1,69 +1,58 @@
-import Image from "next/image";
-import styles from "./page.module.css";
+import Link from "next/link";
+import EventCard from "./components/EventCard";
+import SiteHeader from "./components/SiteHeader";
 
-export default function Home() {
+async function buscarEventos() {
+  try {
+    const resposta = await fetch("http://localhost:3001/eventos", { cache: "no-store" });
+    if (!resposta.ok) return { eventos: [], erro: true };
+    return { eventos: await resposta.json(), erro: false };
+  } catch {
+    return { eventos: [], erro: true };
+  }
+}
+
+export default async function Home() {
+  const { eventos, erro } = await buscarEventos();
+  const agora = new Date();
+  const hoje = `${agora.getFullYear()}-${String(agora.getMonth() + 1).padStart(2, "0")}-${String(agora.getDate()).padStart(2, "0")}`;
+  const proximos = [...eventos]
+    .filter((evento) => evento.data >= hoje)
+    .sort((a, b) => a.data.localeCompare(b.data))
+    .slice(0, 4);
   return (
-    <div className={styles.page}>
-      <main className={styles.main}>
-        <Image
-          className={styles.logo}
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className={styles.intro}>
-          <h1>
-            To get started, edit the{" "}
-            <code className={styles.code}>page.js</code> file.
-          </h1>
-          <p>
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className={styles.ctas}>
-          <a
-            className={styles.primary}
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className={styles.logo}
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={14}
-            />
-            Deploy Now
-          </a>
-          <a
-            className={styles.secondary}
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
+    <>
+      <SiteHeader />
+      <main className="page-shell home-page">
+        <section className="home-intro" aria-labelledby="home-title">
+          <h1 id="home-title">Agenda de eventos para quem programa.</h1>
+          <p>Hackathon no sábado, palestra no meio da semana e um espaço para testar o jogo do colega.</p>
+          <div className="home-actions">
+            <Link className="button button-primary" href="/eventos">Ver agenda</Link>
+            <Link className="home-secondary-link" href="/eventos#novo-evento">Cadastrar evento</Link>
+          </div>
+        </section>
+
+        <section className="upcoming-section" aria-labelledby="upcoming-title">
+          <div className="list-heading">
+            <span id="upcoming-title">próximos eventos / {proximos.length}</span>
+            <Link className="text-link" href="/eventos">todos os eventos</Link>
+          </div>
+          {proximos.length ? (
+            <ul className="ag-lista">
+              {proximos.map((evento) => <EventCard key={evento.id} evento={evento} />)}
+            </ul>
+          ) : erro ? (
+            <p className="error-state" role="alert">Não foi possível carregar os eventos. Verifique se a API está rodando.</p>
+          ) : (
+            <p className="empty-state">Ainda não há eventos por aqui. Que tal criar o primeiro?</p>
+          )}
+        </section>
       </main>
-    </div>
+      <footer className="site-footer page-shell">
+        <span>Dev&apos;Space</span>
+        <span>Agenda da comunidade dev</span>
+      </footer>
+    </>
   );
 }

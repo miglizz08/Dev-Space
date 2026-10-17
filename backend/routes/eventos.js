@@ -3,6 +3,11 @@ import { eventos } from '../dados/eventos.js';
 
 const router = Router();
 let proximoId = 3;
+const tiposValidos = ['hackathon', 'palestra', 'networking', 'game-day'];
+
+function tipoEhValido(tipo) {
+    return typeof tipo === 'string' && tiposValidos.includes(tipo);
+}
 
 function dataEhValida(dataString) {
     if (typeof dataString !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(dataString)) {
@@ -29,6 +34,7 @@ router.post('/', (req, res) => {
     const data = req.body?.data
     const horario = req.body?.horario
     const local = req.body?.local
+    const tipo = req.body?.tipo
 
     if(typeof titulo !== 'string' || titulo.trim() === ''){
         return res.status(400).json({mensagem: 'Título é obrigatório.'});
@@ -45,6 +51,9 @@ router.post('/', (req, res) => {
     if(typeof local !== 'string' || local.trim() === ''){
         return res.status(400).json({mensagem: "Local é obrigatório."});
     }
+    if(!tipoEhValido(tipo)){
+        return res.status(400).json({mensagem: 'Tipo inválido. Selecione um tipo de evento válido.'});
+    }
     
     const novoEvento = {
         id: proximoId,
@@ -52,6 +61,7 @@ router.post('/', (req, res) => {
         data: req.body.data,
         horario: req.body.horario,
         local: req.body.local,
+        tipo,
         descricao: req.body.descricao
     }
     
@@ -62,7 +72,7 @@ router.post('/', (req, res) => {
 
 router.put('/:id', (req, res) => {
     const id = Number(req.params.id);
-    const {titulo, data, horario, local, descricao} = req.body;
+    const {titulo, data, horario, local, tipo, descricao} = req.body;
 
     if (typeof titulo !== 'string' || titulo.trim() === ''){
         return res.status(400).json({mensagem: 'Título é obrigatorio.'})
@@ -79,6 +89,9 @@ router.put('/:id', (req, res) => {
     if (typeof local !== 'string' || local.trim() === ''){
         return res.status(400).json({mensagem: 'Local é obrigatorio.'})
     }
+    if (!tipoEhValido(tipo)){
+        return res.status(400).json({mensagem: 'Tipo inválido. Selecione um tipo de evento válido.'});
+    }
     if (descricao !== undefined && typeof descricao !== 'string'){
         return res.status(400).json({mensagem: 'Descrição deve ser um texto.'});
     }
@@ -93,6 +106,7 @@ router.put('/:id', (req, res) => {
     evento.data = data;
     evento.horario = horario;
     evento.local = local;
+    evento.tipo = tipo;
     evento.descricao = descricao ?? '';
 
     res.json(evento);
