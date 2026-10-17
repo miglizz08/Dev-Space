@@ -2,7 +2,7 @@ import { Router } from 'express';
 import { eventos } from '../dados/eventos.js';
 
 const router = Router();
-let proximoId = 3;
+let proximoId = eventos.reduce((maiorId, evento) => Math.max(maiorId, evento.id), 0) + 1;
 const tiposValidos = ['hackathon', 'palestra', 'networking', 'game-day'];
 
 function tipoEhValido(tipo) {
@@ -23,6 +23,10 @@ function dataEhValida(dataString) {
     const diaConfere = data.getUTCDate() === dia;
 
     return anoConfere && mesConfere && diaConfere;
+}
+
+function horarioEhValido(horario) {
+    return typeof horario === 'string' && /^([01]\d|2[0-3]):[0-5]\d$/.test(horario);
 }
 
 router.get('/', (req, res) => {
@@ -48,11 +52,17 @@ router.post('/', (req, res) => {
     if(typeof horario !== 'string' || horario.trim() === ''){
         return res.status(400).json({mensagem: "Horário é obrigatório."});
     }
+    if(!horarioEhValido(horario)){
+        return res.status(400).json({mensagem: "Horário inválido. Use o formato HH:MM."});
+    }
     if(typeof local !== 'string' || local.trim() === ''){
         return res.status(400).json({mensagem: "Local é obrigatório."});
     }
     if(!tipoEhValido(tipo)){
         return res.status(400).json({mensagem: 'Tipo inválido. Selecione um tipo de evento válido.'});
+    }
+    if (req.body.descricao !== undefined && typeof req.body.descricao !== 'string'){
+        return res.status(400).json({mensagem: 'Descrição deve ser um texto.'});
     }
     
     const novoEvento = {
@@ -62,7 +72,7 @@ router.post('/', (req, res) => {
         horario: req.body.horario,
         local: req.body.local,
         tipo,
-        descricao: req.body.descricao
+        descricao: req.body.descricao ?? ''
     }
     
     proximoId += 1;
@@ -75,19 +85,22 @@ router.put('/:id', (req, res) => {
     const {titulo, data, horario, local, tipo, descricao} = req.body;
 
     if (typeof titulo !== 'string' || titulo.trim() === ''){
-        return res.status(400).json({mensagem: 'Título é obrigatorio.'})
+        return res.status(400).json({mensagem: 'Título é obrigatório.'})
     }
     if (typeof data !== 'string' || data.trim() === ''){
-        return res.status(400).json({mensagem: 'Data é obrigatoria.'})
+        return res.status(400).json({mensagem: 'Data é obrigatória.'})
     }
     if (!dataEhValida(data)) {
         return res.status(400).json({ mensagem: "Data inválida. Use o formato AAAA-MM-DD e uma data real." });
     }
     if (typeof horario !== 'string' || horario.trim() === ''){
-        return res.status(400).json({mensagem: 'Horário é obrigatorio.'})
+        return res.status(400).json({mensagem: 'Horário é obrigatório.'})
+    }
+    if (!horarioEhValido(horario)){
+        return res.status(400).json({mensagem: "Horário inválido. Use o formato HH:MM."});
     }
     if (typeof local !== 'string' || local.trim() === ''){
-        return res.status(400).json({mensagem: 'Local é obrigatorio.'})
+        return res.status(400).json({mensagem: 'Local é obrigatório.'})
     }
     if (!tipoEhValido(tipo)){
         return res.status(400).json({mensagem: 'Tipo inválido. Selecione um tipo de evento válido.'});

@@ -1,20 +1,34 @@
-# Organiza Eventos
+# Dev'Space — Organiza Eventos
 
-Projeto acadêmico da disciplina **Programação Front-End 01** para cadastrar e organizar festas e eventos.
+Projeto acadêmico da disciplina **Programação Front-End 01** para organizar eventos da comunidade de desenvolvedores.
 
-## Estado atual
+## Proposta do projeto
 
-- **API:** Node.js e Express com rotas para listar, cadastrar, editar e excluir eventos.
-- **Página de eventos:** /eventos busca os dados da API, apresenta as informações de cada evento e oferece controles para editar e excluir. Também mostra mensagens quando a API falha ou não há eventos cadastrados.
-- **Cadastro:** o formulário envia o evento à API, apresenta uma mensagem de sucesso ou erro, impede envios repetidos, limpa os campos após o sucesso e atualiza a lista.
-- **Armazenamento:** os eventos ficam em um array na memória da API, que começa com dois exemplos. Os cadastros e alterações são perdidos quando o servidor reinicia.
-- **CORS:** configurado para permitir requisições do front-end em `http://localhost:3000`.
+- **Nome:** Dev'Space
+- **Objetivo:** agendar e organizar eventos para a comunidade de desenvolvedores, como hackathons, palestras, encontros de networking e game days.
+- **Usuário principal:** quem organiza e divulga eventos dev.
+- **Dados gerenciados:** título, data, horário, local, tipo e descrição.
 
-A página inicial (/) ainda é a página padrão do Next.js. A interface permite cadastrar, editar e excluir eventos. A página de eventos também informa quando não consegue carregar a lista ou quando ela está vazia.
+## Funcionalidades
+
+- Home com os próximos eventos.
+- Página `/eventos` com listagem e filtro por tipo.
+- Cadastro, edição e exclusão de eventos.
+- Mensagens de sucesso e erro nas ações.
+- Layout responsivo para computador e celular.
+
+## Tipos de evento
+
+Os tipos aceitos são:
+
+- `hackathon`
+- `palestra`
+- `networking`
+- `game-day`
 
 ## Como executar
 
-Tenha Node.js e npm instalados. Abra dois terminais na raiz do projeto e inicie a API antes do front-end.
+Tenha Node.js e npm instalados. Abra dois terminais na raiz do projeto e execute primeiro a API.
 
 **Terminal 1 — API na porta 3001**
 
@@ -32,34 +46,55 @@ npm ci
 npm run dev
 ~~~
 
-Acesse `http://localhost:3000/eventos`. A página precisa da API em execução para carregar a lista e cadastrar eventos. Para consultar os dados em JSON, use `http://localhost:3001/eventos`.
+Acesse `http://localhost:3000`. A API fica disponível em `http://localhost:3001`.
 
-## Rotas da API
+## Rotas da API e validação
 
-| Método | Rota | Resultado |
+| Método | Rota | Resposta |
 | --- | --- | --- |
-| `GET` | `/eventos` | Retorna todos os eventos. |
-| `POST` | `/eventos` | Cadastra um evento com ID sequencial e retorna status 201. |
-| `PUT` | `/eventos/:id` | Atualiza um evento existente. |
-| `DELETE` | `/eventos/:id` | Remove um evento. |
+| `GET` | `/eventos` | Lista os eventos (200). |
+| `POST` | `/eventos` | Cadastra um evento (201) ou retorna erro de validação (400). |
+| `PUT` | `/eventos/:id` | Atualiza um evento (200), retorna 400 para dados inválidos ou 404 se o ID não existir. |
+| `DELETE` | `/eventos/:id` | Exclui um evento (200) ou retorna 404 se o ID não existir. |
 
-No cadastro e na edição, `titulo`, `data`, `horario` e `local` devem ser textos não vazios. Dados obrigatórios inválidos retornam status 400. `descricao` é opcional. A edição e a exclusão retornam status 404 se o ID não corresponder a um evento. A API ainda não valida o formato real da data e do horário.
+Para cadastrar ou editar, os campos `titulo`, `data`, `horario`, `local` e `tipo` são obrigatórios. O título e o local devem conter texto; a data deve ser válida no formato `AAAA-MM-DD`; o horário deve usar o formato de 24 horas `HH:MM`; e o tipo deve ser um dos quatro tipos listados acima. A `descricao` é opcional, mas, se enviada, deve ser texto. Campos inválidos retornam status 400.
 
-Exemplo de corpo JSON para cadastrar ou editar:
+Exemplo de corpo JSON:
 
 ~~~json
 {
-  "titulo": "Encontro de música",
+  "titulo": "Hackathon: soluções para a cidade",
   "data": "2026-11-15",
-  "horario": "19:00",
-  "local": "Centro cultural",
-  "descricao": "Apresentações musicais abertas ao público."
+  "horario": "09:00",
+  "local": "SENAI São Caetano",
+  "tipo": "hackathon",
+  "descricao": "Um dia para criar projetos em equipe."
 }
 ~~~
 
-## Próximos passos
+## Estrutura de pastas
 
-1. Substituir a página inicial padrão e revisar idioma, metadados e layout para computador e celular.
-2. Melhorar a validação de data e horário na API e conferir o fluxo completo antes da demonstração.
+~~~text
+backend/
+├── dados/
+│   └── eventos.js
+├── routes/
+│   └── eventos.js
+└── index.js
 
-Inscrições e venda de ingressos não fazem parte do escopo inicial.
+frontend/
+├── lib/
+│   └── tipos.js
+└── src/
+    └── app/
+        ├── components/
+        ├── eventos/
+        ├── page.js
+        └── layout.js
+~~~
+
+## Limitações e escopo
+
+- Os dados ficam em memória e voltam ao estado inicial quando a API reinicia.
+- A API inicia com quatro eventos de exemplo.
+- Inscrições e venda de ingressos ficam fora do escopo do projeto.

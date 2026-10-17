@@ -35,7 +35,11 @@ export default function EditarEventoForm({ evento, onSucesso }){
 
             sucesso = true;
         }catch(erro){
-            setMensagem(erro.message);
+            setMensagem(
+                erro instanceof TypeError && erro.message === 'Failed to fetch'
+                    ? 'Não foi possível conectar à API. Verifique se ela está rodando.'
+                    : erro.message
+            );
         } finally {
             setSalvando(false);
         }

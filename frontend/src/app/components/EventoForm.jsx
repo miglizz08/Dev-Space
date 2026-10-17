@@ -39,7 +39,11 @@ export default function EventoForm() {
             formulario.reset();
             sucesso = true;
         } catch (erro) {
-            setMensagem(erro.message);
+            setMensagem(
+                erro instanceof TypeError && erro.message === 'Failed to fetch'
+                    ? 'Não foi possível conectar à API. Verifique se ela está rodando.'
+                    : erro.message
+            );
             setErro(true);
         } finally {
             setEnviando(false);

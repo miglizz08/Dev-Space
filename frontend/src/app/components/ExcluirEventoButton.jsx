@@ -8,6 +8,8 @@ export default function ExcluirEventoButton({ id, onSucesso }) {
     const router = useRouter();
 
     async function excluir() {
+        if (!window.confirm("Excluir este evento?")) return;
+
         setMensagem('');
         setExcluindo(true);
 
@@ -26,7 +28,11 @@ export default function ExcluirEventoButton({ id, onSucesso }) {
 
             sucesso = true;
         } catch (erro) {
-            setMensagem(erro.message);
+            setMensagem(
+                erro instanceof TypeError && erro.message === 'Failed to fetch'
+                    ? 'Não foi possível conectar à API. Verifique se ela está rodando.'
+                    : erro.message
+            );
         } finally {
             setExcluindo(false);
         }
