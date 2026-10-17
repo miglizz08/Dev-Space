@@ -1,5 +1,6 @@
 node_modules/
 .next/
 .env*
-!.env.example.agents/
+!.env.example
+.agents/
 skills-lock.json
