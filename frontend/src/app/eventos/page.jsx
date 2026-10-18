@@ -27,13 +27,15 @@ export default async function EventosPage() {
           <Link className="button button-primary" href="#novo-evento">Criar evento</Link>
         </div>
 
-        {erro ? (
-          <p className="error-state" role="alert">Não foi possível carregar os eventos. Verifique se a API está rodando.</p>
-        ) : eventos.length ? (
-          <EventoLista eventos={eventos} />
-        ) : (
-          <p className="empty-state">Nenhum evento cadastrado. Use o formulário para criar o primeiro.</p>
-        )}
+        <div id="lista-eventos">
+          {erro ? (
+            <p className="error-state" role="alert">Não foi possível carregar os eventos. Verifique se a API está rodando.</p>
+          ) : eventos.length ? (
+            <EventoLista eventos={eventos} />
+          ) : (
+            <p className="empty-state">Nenhum evento cadastrado. Use o formulário para criar o primeiro.</p>
+          )}
+        </div>
 
         <section id="novo-evento" className="new-event-section" aria-labelledby="new-event-title">
           <div className="section-heading">

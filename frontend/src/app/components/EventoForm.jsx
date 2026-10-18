@@ -2,27 +2,43 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { tipos } from "../../../lib/tipos";
+import { validarEvento } from "../../../lib/validacao";
+import CampoErro from "./CampoErro";
+
+const mensagemSucesso = "Evento cadastrado com sucesso.";
 
 export default function EventoForm() {
     const [mensagem, setMensagem] = useState('');
     const [erro, setErro] = useState(false);
     const [enviando, setEnviando] = useState(false);
+    const [errosCampos, setErrosCampos] = useState({});
     const router = useRouter();
+
+    function limparErro(campo) {
+        setErrosCampos((atuais) => ({ ...atuais, [campo]: "" }));
+    }
 
     async function enviarFormulario(event) {
         event.preventDefault();
 
         const formulario = event.currentTarget;
+        const formData = new FormData(formulario);
+        const dados = Object.fromEntries(formData);
+        const novosErros = validarEvento(dados);
+        setErrosCampos(novosErros);
         setMensagem('');
         setErro(false);
-        setEnviando(true);
 
+        const primeiroErro = Object.keys(novosErros).find((campo) => novosErros[campo]);
+        if (primeiroErro) {
+            formulario.elements.namedItem(primeiroErro)?.focus();
+            return;
+        }
+
+        setEnviando(true);
         let sucesso = false;
 
         try {
-            const formData = new FormData(formulario);
-            const dados = Object.fromEntries(formData);
-
             const resposta = await fetch('http://localhost:3001/eventos', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -35,7 +51,7 @@ export default function EventoForm() {
                 throw new Error(resultado.mensagem);
             }
 
-            setMensagem('Evento cadastrado com sucesso.');
+            setMensagem(mensagemSucesso);
             formulario.reset();
             sucesso = true;
         } catch (erro) {
@@ -55,35 +71,72 @@ export default function EventoForm() {
     }
 
     return (
-        <form onSubmit={enviarFormulario}>
+        <form onSubmit={enviarFormulario} noValidate>
             <label htmlFor="titulo">Título: </label>
-            <input id="titulo" type="text" name="titulo" required />
+            <div className="field-control">
+                <input id="titulo" type="text" name="titulo" required
+                    aria-invalid={errosCampos.titulo ? "true" : undefined}
+                    aria-describedby={errosCampos.titulo ? "erro-titulo" : undefined}
+                    onChange={() => limparErro("titulo")} />
+                <CampoErro id="erro-titulo" mensagem={errosCampos.titulo} />
+            </div>
 
             <label htmlFor="data">Data: </label>
-            <input id="data" type="date" name="data" required />
+            <div className="field-control">
+                <input id="data" type="date" name="data" required
+                    aria-invalid={errosCampos.data ? "true" : undefined}
+                    aria-describedby={errosCampos.data ? "erro-data" : undefined}
+                    onChange={() => limparErro("data")} />
+                <CampoErro id="erro-data" mensagem={errosCampos.data} />
+            </div>
 
             <label htmlFor="horario">Horário: </label>
-            <input id="horario" type="time" name="horario" required />
+            <div className="field-control">
+                <input id="horario" type="time" name="horario" required
+                    aria-invalid={errosCampos.horario ? "true" : undefined}
+                    aria-describedby={errosCampos.horario ? "erro-horario" : undefined}
+                    onChange={() => limparErro("horario")} />
+                <CampoErro id="erro-horario" mensagem={errosCampos.horario} />
+            </div>
 
             <label htmlFor="local">Local: </label>
-            <input id="local" type="text" name="local" required />
+            <div className="field-control">
+                <input id="local" type="text" name="local" required
+                    aria-invalid={errosCampos.local ? "true" : undefined}
+                    aria-describedby={errosCampos.local ? "erro-local" : undefined}
+                    onChange={() => limparErro("local")} />
+                <CampoErro id="erro-local" mensagem={errosCampos.local} />
+            </div>
 
             <label htmlFor="tipo">Tipo do evento: </label>
-            <select id="tipo" name="tipo" required defaultValue="">
-                <option value="" disabled>Selecione um tipo</option>
-                {tipos.map((tipo) => (
-                    <option key={tipo.value} value={tipo.value}>{tipo.label}</option>
-                ))}
-            </select>
+            <div className="field-control">
+                <select id="tipo" name="tipo" required defaultValue=""
+                    aria-invalid={errosCampos.tipo ? "true" : undefined}
+                    aria-describedby={errosCampos.tipo ? "erro-tipo" : undefined}
+                    onChange={() => limparErro("tipo")}>
+                    <option value="" disabled>Selecione um tipo</option>
+                    {tipos.map((tipo) => (
+                        <option key={tipo.value} value={tipo.value}>{tipo.label}</option>
+                    ))}
+                </select>
+                <CampoErro id="erro-tipo" mensagem={errosCampos.tipo} />
+            </div>
 
             <label htmlFor="descricao">Descrição: </label>
-            <textarea id="descricao" name="descricao"></textarea>
+            <div className="field-control field-control-wide">
+                <textarea id="descricao" name="descricao"></textarea>
+            </div>
 
             <button className="button button-primary" type="submit" disabled={enviando}>
                 {enviando ? 'Cadastrando...' : 'Cadastrar evento'}
             </button>
 
-            {mensagem && <p className={erro ? "error-state" : "status-state"} role={erro ? "alert" : "status"}>{mensagem}</p>}
+            {mensagem && (
+                <p className={erro ? "error-state" : "status-state"} role={erro ? "alert" : "status"}>
+                    {mensagem}
+                    {!erro && mensagem === mensagemSucesso && <> <a href="#lista-eventos">Ver na agenda</a></>}
+                </p>
+            )}
         </form>
     );
 }
