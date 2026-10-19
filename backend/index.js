@@ -4,7 +4,7 @@ import eventosRouter from './routes/eventos.js';
 
 const app = express();
 
-app.use(cors({ origin: 'http://localhost:3000' }));
+app.use(cors({ origin: 'http://localhost:3001' }));
 app.use(express.json());
 
 app.use('/eventos', eventosRouter);

@@ -78,7 +78,7 @@ export default function EditarEventoForm({ evento, onSucesso }) {
 
     return (
         <form onSubmit={salvar} noValidate>
-            <label htmlFor={campoId("titulo")}>Título: </label>
+            <label htmlFor={campoId("titulo")}>Título</label>
             <div className="field-control">
                 <input id={campoId("titulo")} type="text" name="titulo" defaultValue={evento.titulo} required
                     aria-invalid={errosCampos.titulo ? "true" : undefined}
@@ -87,7 +87,7 @@ export default function EditarEventoForm({ evento, onSucesso }) {
                 <CampoErro id={erroId("titulo")} mensagem={errosCampos.titulo} />
             </div>
 
-            <label htmlFor={campoId("data")}>Data: </label>
+            <label htmlFor={campoId("data")}>Data</label>
             <div className="field-control">
                 <input id={campoId("data")} type="date" name="data" defaultValue={evento.data} required
                     aria-invalid={errosCampos.data ? "true" : undefined}
@@ -96,7 +96,7 @@ export default function EditarEventoForm({ evento, onSucesso }) {
                 <CampoErro id={erroId("data")} mensagem={errosCampos.data} />
             </div>
 
-            <label htmlFor={campoId("horario")}>Horário: </label>
+            <label htmlFor={campoId("horario")}>Horário</label>
             <div className="field-control">
                 <input id={campoId("horario")} type="time" name="horario" defaultValue={evento.horario} required
                     aria-invalid={errosCampos.horario ? "true" : undefined}
@@ -105,7 +105,7 @@ export default function EditarEventoForm({ evento, onSucesso }) {
                 <CampoErro id={erroId("horario")} mensagem={errosCampos.horario} />
             </div>
 
-            <label htmlFor={campoId("local")}>Local: </label>
+            <label htmlFor={campoId("local")}>Local</label>
             <div className="field-control">
                 <input id={campoId("local")} type="text" name="local" defaultValue={evento.local} required
                     aria-invalid={errosCampos.local ? "true" : undefined}
@@ -114,7 +114,7 @@ export default function EditarEventoForm({ evento, onSucesso }) {
                 <CampoErro id={erroId("local")} mensagem={errosCampos.local} />
             </div>
 
-            <label htmlFor={campoId("tipo")}>Tipo do evento: </label>
+            <label htmlFor={campoId("tipo")}>Tipo do evento</label>
             <div className="field-control">
                 <select id={campoId("tipo")} name="tipo" defaultValue={evento.tipo ?? ''} required
                     aria-invalid={errosCampos.tipo ? "true" : undefined}
@@ -128,7 +128,7 @@ export default function EditarEventoForm({ evento, onSucesso }) {
                 <CampoErro id={erroId("tipo")} mensagem={errosCampos.tipo} />
             </div>
 
-            <label htmlFor={campoId("descricao")}>Descrição: </label>
+            <label htmlFor={campoId("descricao")}>Descrição</label>
             <div className="field-control">
                 <textarea id={campoId("descricao")} name="descricao" defaultValue={evento.descricao}></textarea>
             </div>

@@ -72,59 +72,71 @@ export default function EventoForm() {
 
     return (
         <form onSubmit={enviarFormulario} noValidate>
-            <label htmlFor="titulo">Título: </label>
-            <div className="field-control">
-                <input id="titulo" type="text" name="titulo" required
-                    aria-invalid={errosCampos.titulo ? "true" : undefined}
-                    aria-describedby={errosCampos.titulo ? "erro-titulo" : undefined}
-                    onChange={() => limparErro("titulo")} />
-                <CampoErro id="erro-titulo" mensagem={errosCampos.titulo} />
+            <div className="campo campo-cheio">
+                <label htmlFor="titulo">título</label>
+                <div className="field-control">
+                    <input id="titulo" type="text" name="titulo" required
+                        aria-invalid={errosCampos.titulo ? "true" : undefined}
+                        aria-describedby={errosCampos.titulo ? "erro-titulo" : undefined}
+                        onChange={() => limparErro("titulo")} />
+                    <CampoErro id="erro-titulo" mensagem={errosCampos.titulo} />
+                </div>
             </div>
 
-            <label htmlFor="data">Data: </label>
-            <div className="field-control">
-                <input id="data" type="date" name="data" required
-                    aria-invalid={errosCampos.data ? "true" : undefined}
-                    aria-describedby={errosCampos.data ? "erro-data" : undefined}
-                    onChange={() => limparErro("data")} />
-                <CampoErro id="erro-data" mensagem={errosCampos.data} />
+            <div className="campo">
+                <label htmlFor="data">data</label>
+                <div className="field-control">
+                    <input id="data" type="date" name="data" required
+                        aria-invalid={errosCampos.data ? "true" : undefined}
+                        aria-describedby={errosCampos.data ? "erro-data" : undefined}
+                        onChange={() => limparErro("data")} />
+                    <CampoErro id="erro-data" mensagem={errosCampos.data} />
+                </div>
             </div>
 
-            <label htmlFor="horario">Horário: </label>
-            <div className="field-control">
-                <input id="horario" type="time" name="horario" required
-                    aria-invalid={errosCampos.horario ? "true" : undefined}
-                    aria-describedby={errosCampos.horario ? "erro-horario" : undefined}
-                    onChange={() => limparErro("horario")} />
-                <CampoErro id="erro-horario" mensagem={errosCampos.horario} />
+            <div className="campo">
+                <label htmlFor="horario">horário</label>
+                <div className="field-control">
+                    <input id="horario" type="time" name="horario" required
+                        aria-invalid={errosCampos.horario ? "true" : undefined}
+                        aria-describedby={errosCampos.horario ? "erro-horario" : undefined}
+                        onChange={() => limparErro("horario")} />
+                    <CampoErro id="erro-horario" mensagem={errosCampos.horario} />
+                </div>
             </div>
 
-            <label htmlFor="local">Local: </label>
-            <div className="field-control">
-                <input id="local" type="text" name="local" required
-                    aria-invalid={errosCampos.local ? "true" : undefined}
-                    aria-describedby={errosCampos.local ? "erro-local" : undefined}
-                    onChange={() => limparErro("local")} />
-                <CampoErro id="erro-local" mensagem={errosCampos.local} />
+            <div className="campo">
+                <label htmlFor="local">local</label>
+                <div className="field-control">
+                    <input id="local" type="text" name="local" required
+                        aria-invalid={errosCampos.local ? "true" : undefined}
+                        aria-describedby={errosCampos.local ? "erro-local" : undefined}
+                        onChange={() => limparErro("local")} />
+                    <CampoErro id="erro-local" mensagem={errosCampos.local} />
+                </div>
             </div>
 
-            <label htmlFor="tipo">Tipo do evento: </label>
-            <div className="field-control">
-                <select id="tipo" name="tipo" required defaultValue=""
-                    aria-invalid={errosCampos.tipo ? "true" : undefined}
-                    aria-describedby={errosCampos.tipo ? "erro-tipo" : undefined}
-                    onChange={() => limparErro("tipo")}>
-                    <option value="" disabled>Selecione um tipo</option>
-                    {tipos.map((tipo) => (
-                        <option key={tipo.value} value={tipo.value}>{tipo.label}</option>
-                    ))}
-                </select>
-                <CampoErro id="erro-tipo" mensagem={errosCampos.tipo} />
+            <div className="campo">
+                <label htmlFor="tipo">tipo do evento</label>
+                <div className="field-control">
+                    <select id="tipo" name="tipo" required defaultValue=""
+                        aria-invalid={errosCampos.tipo ? "true" : undefined}
+                        aria-describedby={errosCampos.tipo ? "erro-tipo" : undefined}
+                        onChange={() => limparErro("tipo")}>
+                        <option value="" disabled>Selecione um tipo</option>
+                        {tipos.map((tipo) => (
+                            <option key={tipo.value} value={tipo.value}>{tipo.label}</option>
+                        ))}
+                    </select>
+                    <CampoErro id="erro-tipo" mensagem={errosCampos.tipo} />
+                </div>
             </div>
 
-            <label htmlFor="descricao">Descrição: </label>
-            <div className="field-control field-control-wide">
-                <textarea id="descricao" name="descricao"></textarea>
+            <div className="campo campo-cheio">
+                <label htmlFor="descricao">descrição</label>
+                <div className="field-control">
+                    <textarea id="descricao" name="descricao"></textarea>
+                </div>
             </div>
 
             <button className="button button-primary" type="submit" disabled={enviando}>

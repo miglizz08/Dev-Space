@@ -20,6 +20,7 @@ export default function FiltroTipos({ selecionado, onSelecionar, quantidade }) {
             key={tipo.value}
             type="button"
             className={selecionado === tipo.value ? "ativo" : ""}
+            style={{ "--cor-ativa": `var(--tipo-${tipo.value})` }}
             onClick={() => onSelecionar(tipo.value)}
             aria-pressed={selecionado === tipo.value}
           >
