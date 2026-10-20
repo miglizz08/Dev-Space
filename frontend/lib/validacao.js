@@ -1,6 +1,5 @@
 import { tipos } from "./tipos";
 
-// Valida os campos antes de enviar o formulário.
 export function validarEvento(dados) {
   const erros = {
     titulo: "",

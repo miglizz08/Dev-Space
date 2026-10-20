@@ -1,4 +1,3 @@
-// Retorna a data local no formato usado pelos eventos.
 export function dataHoje() {
   const hoje = new Date();
   const ano = hoje.getFullYear();

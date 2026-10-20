@@ -1,4 +1,3 @@
-// Ícones lineares para os tipos conhecidos de evento.
 export default function TipoIcone({ tipo }) {
   let desenho;
 
