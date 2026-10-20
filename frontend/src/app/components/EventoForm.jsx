@@ -37,6 +37,7 @@ export default function EventoForm() {
 
         setEnviando(true);
         let sucesso = false;
+        let novoEvento = null;
 
         try {
             const resposta = await fetch('http://localhost:3001/eventos', {
@@ -51,6 +52,7 @@ export default function EventoForm() {
                 throw new Error(resultado.mensagem);
             }
 
+            novoEvento = resultado;
             setMensagem(mensagemSucesso);
             formulario.reset();
             sucesso = true;
@@ -66,6 +68,10 @@ export default function EventoForm() {
         }
 
         if (sucesso) {
+            if (novoEvento?.id !== undefined) {
+                sessionStorage.setItem("evento-cadastrado-id", String(novoEvento.id));
+                window.dispatchEvent(new CustomEvent("evento-cadastrado", { detail: { id: novoEvento.id } }));
+            }
             router.refresh();
         }
     }

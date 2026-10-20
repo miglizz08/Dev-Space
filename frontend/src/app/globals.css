@@ -12,6 +12,9 @@
   --tipo-palestra: #60a5fa;
   --tipo-networking: #4ade80;
   --tipo-game-day: #e879f9;
+  --tipo-workshop: #facc15;
+  --tipo-demo-day: #22d3ee;
+  --tipo-mentoria: #f87171;
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -66,11 +69,13 @@ button { color: inherit; }
 .text-link { display: inline-flex; min-height: 44px; align-items: center; color: var(--text-muted); font: 400 12px/1.2 ui-monospace, monospace; text-decoration: underline; text-decoration-color: var(--border); text-underline-offset: 4px; }
 .text-link:hover { color: var(--text); }
 
-.ag-lista { list-style: none; margin: 0; padding: 0; border-bottom: 1px solid var(--border); }
+.ag-lista { list-style: none; margin: 0; padding: 0; }
 /* Destaque e respiro mantêm a leitura das linhas da agenda. */
-.ag-linha { display: grid; grid-template-columns: 44px minmax(0, 1fr) auto; column-gap: 18px; align-items: start; padding: 16px 0; padding-inline: 12px; margin-inline: -12px; border-top: 1px solid var(--border); transition: background-color 150ms ease; }
+.ag-linha { display: grid; grid-template-columns: 44px minmax(0, 1fr) auto; column-gap: 18px; align-items: start; padding: 16px 0; padding-inline: 12px; margin-inline: -12px; border-top: 1px solid var(--border); border-left: 3px solid transparent; transition: background-color 150ms ease, border-left-color 300ms ease; }
+.ag-linha:last-child { border-bottom: 1px solid var(--border); }
 .ag-linha:hover { background: var(--card); }
 .ag-proximo { background: var(--card); box-shadow: inset 3px 0 0 var(--accent); }
+.ag-novo { border-left-color: var(--accent); }
 /* Etiqueta discreta para o primeiro evento futuro. */
 .ag-tag { font: 400 11px ui-monospace, monospace; color: var(--accent); border: 1px solid var(--border); border-radius: 4px; padding: 1px 6px; margin-left: 8px; vertical-align: 2px; }
 .ag-passado { opacity: .55; }
@@ -98,9 +103,10 @@ button { color: inherit; }
 
 .ag-filtros { display: flex; justify-content: space-between; align-items: baseline; flex-wrap: wrap; gap: 10px; padding: 22px 0 8px; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 12px; }
 .ag-contagem { color: var(--text-muted); }
-.ag-chips { display: flex; gap: 16px; flex-wrap: wrap; }
+.ag-chips { display: flex; max-width: 100%; gap: 16px; flex-wrap: wrap; }
 .ag-chips button { background: none; border: 0; border-bottom: 1px solid transparent; padding: 0 0 2px; margin: 0; font: inherit; color: var(--text-muted); cursor: pointer; text-transform: lowercase; }
-.ag-chips button.ativo { color: var(--text); border-bottom-color: var(--cor-ativa, var(--accent)); }
+.ag-chips button.ativo { color: var(--cor-ativa, var(--text)); border-bottom-color: var(--cor-ativa, var(--accent)); }
+.ag-chip-contagem { color: var(--text-muted); font-size: 11px; }
 
 /* Mensagens usam o fundo da página e uma borda de estado. */
 .empty-state { padding: 14px 0; border-top: 1px solid var(--border); color: var(--text-muted); font-size: 13px; line-height: 1.55; }
@@ -114,6 +120,7 @@ button { color: inherit; }
 .page-heading { display: flex; justify-content: space-between; align-items: end; gap: 20px; margin-bottom: 20px; }
 .page-kicker { margin-bottom: 8px; color: var(--text-muted); font-size: 12px; line-height: 1; }
 .page-heading h1 { font-size: 30px; font-weight: 500; line-height: 1.15; letter-spacing: -.03em; }
+.page-sub { max-width: 520px; margin: 6px 0 0; color: var(--text-muted); font-size: 15px; }
 .page-heading-title { margin-bottom: 12px; font-size: 30px; font-weight: 500; line-height: 1.15; }
 .eventos-error .button { margin-top: 12px; }
 .skeleton { display: block; height: 14px; background: var(--card); border-radius: 4px; }
@@ -129,16 +136,16 @@ button { color: inherit; }
 .section-heading { min-height: 44px; display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 12px; }
 .section-heading h2 { color: var(--text); font-size: 20px; font-weight: 500; }
 /* Campos agrupados facilitam a leitura e se adaptam à largura disponível. */
-.new-event-section form { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; background: var(--card); border: 1px solid var(--border); border-radius: 8px; padding: 18px; }
+.new-event-section form { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; background: var(--card); border: 1px solid var(--border); border-radius: 8px; padding: 18px; }
 .new-event-section form .campo, .new-event-section form .field-control { min-width: 0; }
 .new-event-section form .campo label { display: block; margin-bottom: 5px; color: var(--text-muted); font: 400 12px ui-monospace, monospace; }
 .new-event-section form .campo-cheio,
 .new-event-section form > button,
 .new-event-section form > p { grid-column: 1 / -1; }
 .new-event-section form input, .new-event-section form select, .new-event-section form textarea {
-  width: 100%; min-height: 44px; border: 1px solid var(--border); border-radius: 4px; background: var(--bg); padding: 9px 11px; color: var(--text); font: 400 14px/1.4 sans-serif;
+  width: 100%; height: 44px; min-height: 44px; border: 1px solid var(--border); border-radius: 4px; background: var(--bg); padding: 9px 12px; color: var(--text); font: 400 14px/1.4 sans-serif;
 }
-.new-event-section form textarea { min-height: 88px; resize: vertical; }
+.new-event-section form textarea { height: 96px; min-height: 96px; resize: vertical; }
 .new-event-section form .button { min-height: 44px; }
 .new-event-section form input:focus-visible, .new-event-section form select:focus-visible, .new-event-section form textarea:focus-visible,
 .ag-acoes form input:focus-visible, .ag-acoes form select:focus-visible, .ag-acoes form textarea:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; border-color: var(--accent); }
@@ -147,6 +154,9 @@ input[aria-invalid="true"], select[aria-invalid="true"], textarea[aria-invalid="
 
 @media (max-width: 760px) {
   .ag-filtros { align-items: flex-start; flex-direction: column; gap: 6px; }
+}
+@media (max-width: 899px) {
+  .new-event-section form { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 @media (max-width: 640px) {
   .page-shell { width: min(100% - 32px, 560px); }
@@ -162,6 +172,8 @@ input[aria-invalid="true"], select[aria-invalid="true"], textarea[aria-invalid="
   .ag-chips { gap: 8px 16px; }
   .events-page { padding-top: 36px; }
   .page-heading { align-items: center; }
+}
+@media (max-width: 559px) {
   .new-event-section form { grid-template-columns: minmax(0, 1fr); }
 }
 @media (prefers-reduced-motion: reduce) {

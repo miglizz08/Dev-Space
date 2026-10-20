@@ -3,7 +3,7 @@ import { eventos } from '../dados/eventos.js';
 
 const router = Router();
 let proximoId = eventos.reduce((maiorId, evento) => Math.max(maiorId, evento.id), 0) + 1;
-const tiposValidos = ['hackathon', 'palestra', 'networking', 'game-day'];
+const tiposValidos = ['hackathon', 'palestra', 'networking', 'game-day', 'workshop', 'demo-day', 'mentoria'];
 
 function tipoEhValido(tipo) {
     return typeof tipo === 'string' && tiposValidos.includes(tipo);

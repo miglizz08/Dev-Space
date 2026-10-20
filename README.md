@@ -25,6 +25,9 @@ Os tipos aceitos são:
 - `palestra`
 - `networking`
 - `game-day`
+- `workshop`
+- `demo-day`
+- `mentoria`
 
 ## Como executar
 
@@ -57,7 +60,7 @@ Acesse `http://localhost:3000`. A API fica disponível em `http://localhost:3001
 | `PUT` | `/eventos/:id` | Atualiza um evento (200), retorna 400 para dados inválidos ou 404 se o ID não existir. |
 | `DELETE` | `/eventos/:id` | Exclui um evento (200) ou retorna 404 se o ID não existir. |
 
-Para cadastrar ou editar, os campos `titulo`, `data`, `horario`, `local` e `tipo` são obrigatórios. O título e o local devem conter texto; a data deve ser válida no formato `AAAA-MM-DD`; o horário deve usar o formato de 24 horas `HH:MM`; e o tipo deve ser um dos quatro tipos listados acima. A `descricao` é opcional, mas, se enviada, deve ser texto. Campos inválidos retornam status 400.
+Para cadastrar ou editar, os campos `titulo`, `data`, `horario`, `local` e `tipo` são obrigatórios. O título e o local devem conter texto; a data deve ser válida no formato `AAAA-MM-DD`; o horário deve usar o formato de 24 horas `HH:MM`; e o tipo deve ser um dos sete tipos listados acima. A `descricao` é opcional, mas, se enviada, deve ser texto. Campos inválidos retornam status 400.
 
 Exemplo de corpo JSON:
 
@@ -96,5 +99,5 @@ frontend/
 ## Limitações e escopo
 
 - Os dados ficam em memória e voltam ao estado inicial quando a API reinicia.
-- A API inicia com quatro eventos de exemplo.
+- A API inicia com sete eventos de exemplo.
 - Inscrições e venda de ingressos ficam fora do escopo do projeto.

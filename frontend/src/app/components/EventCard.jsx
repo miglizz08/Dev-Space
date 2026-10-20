@@ -8,7 +8,7 @@ import ExcluirEventoButton from "./ExcluirEventoButton";
 
 const meses = ["jan", "fev", "mar", "abr", "mai", "jun", "jul", "ago", "set", "out", "nov", "dez"];
 
-export default function EventCard({ evento, onSucesso, destaque = false }) {
+export default function EventCard({ evento, onSucesso, destaque = false, recemCadastrado = false }) {
   const [ano, mes, dia] = evento.data.split("-");
   const hoje = dataHoje();
   const anoAtual = hoje.slice(0, 4);
@@ -19,6 +19,7 @@ export default function EventCard({ evento, onSucesso, destaque = false }) {
     "ag-linha",
     evento.data < hoje && "ag-passado",
     destaque && "ag-proximo",
+    recemCadastrado && "ag-novo",
   ].filter(Boolean).join(" ");
 
   return (

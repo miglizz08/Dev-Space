@@ -34,5 +34,32 @@ export const eventos = [
         local: "Sala de convivência",
         tipo: "networking",
         descricao: "Encontro aberto para devs, estudantes e recrutadores se conhecerem, trocarem contatos e apresentarem projetos em conversas rápidas."
+    },
+    {
+        id: 5,
+        titulo: "Workshop: sua primeira API com Express",
+        data: "2026-12-12",
+        horario: "14:00",
+        local: "Laboratório 3",
+        tipo: "workshop",
+        descricao: "Oficina prática para criar e testar uma API do zero, com acompanhamento de monitores."
+    },
+    {
+        id: 6,
+        titulo: "Demo Day: projetos da turma",
+        data: "2026-12-19",
+        horario: "19:00",
+        local: "Auditório",
+        tipo: "demo-day",
+        descricao: "Cada equipe apresenta o projeto que construiu ao longo do curso para colegas e convidados."
+    },
+    {
+        id: 7,
+        titulo: "Mentoria relâmpago com devs",
+        data: "2026-11-18",
+        horario: "18:00",
+        local: "Sala de convivência",
+        tipo: "mentoria",
+        descricao: "Conversas rápidas de 15 minutos com devs experientes para tirar dúvidas de carreira e código."
     }
 ];

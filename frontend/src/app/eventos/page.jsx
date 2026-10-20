@@ -23,6 +23,7 @@ export default async function EventosPage() {
           <div>
             <p className="page-kicker">Dev&apos;Space / agenda</p>
             <h1>Eventos</h1>
+            <p className="page-sub">Hackathons, palestras, workshops e muito mais, em ordem de data.</p>
           </div>
           <Link className="button button-primary" href="#novo-evento">Criar evento</Link>
         </div>

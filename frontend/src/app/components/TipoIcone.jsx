@@ -34,6 +34,20 @@ export default function TipoIcone({ tipo }) {
         </>
       );
       break;
+    case "workshop":
+      desenho = <path d="M14.5 6.5a4 4 0 0 0-5 5L3 18l3 3 6.5-6.5a4 4 0 0 0 5-5l-2.5 2.5-2.5-.5-.5-2.5z" />;
+      break;
+    case "demo-day":
+      desenho = (
+        <>
+          <rect x="3" y="4" width="18" height="12" rx="2" />
+          <path d="M8 20h8M12 16v4M10 8.5v3l3-1.5z" />
+        </>
+      );
+      break;
+    case "mentoria":
+      desenho = <path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.4A8 8 0 1 1 21 12z" />;
+      break;
     default:
       return null;
   }
